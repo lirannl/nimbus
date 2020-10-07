@@ -22,7 +22,7 @@ function getDates(startDate: Date, stopDate: Date) {
  * @param stepSize How many CVEs will be recieved per API request
  */
 const skipPoints = (max: number, stepSize: number) => {
-  if (max == 0) return [];
+  if (max <= 0) return [];
   return recursiveStartPointsBuilder(max, stepSize);
 }
 
