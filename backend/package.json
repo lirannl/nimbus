@@ -10,11 +10,12 @@
   "author": "Liran Piade and Gabrielle Withers",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.20.0",
     "koa": "^2.13.0",
     "koa-bodyparser": "^4.3.0",
-    "koa-static": "^5.0.0",
     "koa-json": "^2.0.2",
-    "koa-router": "^9.4.0"
+    "koa-router": "^9.4.0",
+    "koa-static": "^5.0.0"
   },
   "devDependencies": {
     "@types/koa": "^2.11.4",
