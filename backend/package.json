@@ -11,19 +11,21 @@
   "author": "Liran Piade and Gabrielle Withers",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.20.0",
     "@koa/cors": "^3.1.0",
+    "axios": "^0.20.0",
     "koa": "^2.13.0",
     "koa-bodyparser": "^4.3.0",
     "koa-json": "^2.0.2",
     "koa-router": "^9.4.0",
-    "koa-static": "^5.0.0"
+    "koa-static": "^5.0.0",
+    "redis": "^3.0.2"
   },
   "devDependencies": {
     "@types/koa": "^2.11.4",
     "@types/koa-router": "^7.4.1",
     "@types/koa-static": "^4.0.1",
     "@types/koa__cors": "^3.0.2",
+    "@types/redis": "^2.8.28",
     "esm-ts-node": "^1.0.7",
     "ts-node-dev": "^1.0.0-pre.63",
     "typescript": "^4.0.3"

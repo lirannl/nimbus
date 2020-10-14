@@ -1,3 +1,4 @@
+import Redis from "redis";
 import Axios from "axios";
 import { Cve } from "./cve_interface";
 
@@ -10,6 +11,34 @@ const addDay = (old: Date, amount = 1) => {
   const msInDay = 24 * 3600 * 1000;
   return new Date(old.valueOf() + (msInDay * amount));
 }
+
+
+const redisClient = Redis.createClient();
+/**
+ * Store data in redis
+ * @param data The data to store
+ */
+const storeInRedis = (data: Cve[], name: string) => {
+  return redisClient.set(name, JSON.stringify(data));
+}
+
+// Determine if a given object is an array of Cves
+function isCveArr(obj: any): obj is Cve[] { return true }
+
+/**
+ * Reading CVE arrays from redis using promises instead of callbacks
+ * @param name The key
+ */
+const getFromRedis = (name: string) => new Promise((resolve, reject) => {
+  redisClient.get(name, (err, reply) => {
+    if (!reply) reject(err);
+    else {
+      const replyObj = JSON.parse(reply);
+      if (isCveArr(replyObj)) resolve(replyObj);
+      else reject(new Error(`"${name}" does not contain a valid array of CVEs.`));
+    }
+  });
+}) as Promise<Cve[]>;
 
 /**
  * Get an array of all dates within the given range
@@ -53,6 +82,8 @@ const recursiveSkipPoints: (
   return recursiveSkipPoints(max, stepSize, newStartPoints);
 };
 
+const getPersKey = (day: Date) => day.toISOString().split("T")[0];
+
 /**
  * Make a single request to Circlu
  * @param day Day to fetch for
@@ -70,12 +101,8 @@ const singleCircluReq = async (day: Date, skip?: number, limit?: number) => {
     skip: skip || 0,
   };
   if (limit) Object.assign(headersObj, { limit: limit });
-  // Todo: Implement persistence with S3 buckets + redis caches
-  // 
-  return Object.assign(
-    (await Axios("https://cve.circl.lu/api/query", { headers: headersObj })).data
-    , { source: "circlu" }) as
-    { results: Cve[], total: number, source: string };
+  return (await Axios("https://cve.circl.lu/api/query", { headers: headersObj })).data as
+    { results: Cve[], total: number };
 }
 
 /**
@@ -83,17 +110,15 @@ const singleCircluReq = async (day: Date, skip?: number, limit?: number) => {
  * @param day The day to get all cves for
  */
 const cvesForDay = async (day: Date) => {
-  const { results: firstCves, total, source } = await singleCircluReq(day);
   // Persistent sources will return all CVEs for the given day immediately, therefore, no further fetches are needed.
-  if (source != "circlu") {
-    if (source != "redis") {
-      // Store in redis
-    }
-    if (source != "S3") {
-      // Store in S3
-    }
-    return firstCves;
+  try {
+    const cves = await getFromRedis(getPersKey(day));
+    // Todo: store in S3 here
+    return cves;
   }
+  catch {}
+  // Try getting the results from S3
+  const { results: firstCves, total } = await singleCircluReq(day);
   const reqLength = firstCves.length;
   const skips = skipPoints(total, reqLength);
   const latterCves = await Promise.all(skips.map(
@@ -103,7 +128,9 @@ const cvesForDay = async (day: Date) => {
   const allCves = firstCves.concat(...latterCves);
   // Ignore CVEs that are rejected or disputed
   const relevantCves = allCves.filter(cve => !cve.summary.startsWith("** "));
-  // TODO: Entity analysis on the CVEs + storage in S3 + redis
+  // TODO: Entity analysis on the CVEs + storage in S3
+
+  storeInRedis(relevantCves, day.toISOString().split("T")[0]);
   return relevantCves;
 }
 
