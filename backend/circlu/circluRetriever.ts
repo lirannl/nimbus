@@ -71,6 +71,7 @@ const singleCircluReq = async (day: Date, skip?: number, limit?: number) => {
   };
   if (limit) Object.assign(headersObj, { limit: limit });
   // Todo: Implement persistence with S3 buckets + redis caches
+  // 
   return Object.assign(
     (await Axios("https://cve.circl.lu/api/query", { headers: headersObj })).data
     , { source: "circlu" }) as
@@ -84,18 +85,25 @@ const singleCircluReq = async (day: Date, skip?: number, limit?: number) => {
 const cvesForDay = async (day: Date) => {
   const { results: firstCves, total, source } = await singleCircluReq(day);
   // Persistent sources will return all CVEs for the given day immediately, therefore, no further fetches are needed.
-  if (source != "circlu")
+  if (source != "circlu") {
+    if (source != "redis") {
+      // Store in redis
+    }
+    if (source != "S3") {
+      // Store in S3
+    }
     return firstCves;
+  }
   const reqLength = firstCves.length;
   const skips = skipPoints(total, reqLength);
   const latterCves = await Promise.all(skips.map(
     skip => singleCircluReq(day, skip, reqLength).then(res => res.results)
   ));
   // Add all of the CVEs together into a single array
-  const allCves = firstCves.concat(...latterCves); //.reduce((acc, curr) => acc.concat(curr), []));
+  const allCves = firstCves.concat(...latterCves);
   // Ignore CVEs that are rejected or disputed
   const relevantCves = allCves.filter(cve => !cve.summary.startsWith("** "));
-  // TODO: store the relevant CVEs that were retrieved in persistent sources
+  // TODO: Entity analysis on the CVEs + storage in S3 + redis
   return relevantCves;
 }
 

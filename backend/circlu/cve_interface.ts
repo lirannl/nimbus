@@ -15,6 +15,7 @@ export interface Cve {
     vulnerable_configuration:         string[];
     vulnerable_configuration_cpe_2_2: any[];
     vulnerable_product:               string[];
+    entities?: string[];
 }
 
 export interface Access {
