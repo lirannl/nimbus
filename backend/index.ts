@@ -1,4 +1,3 @@
-import cors from '@koa/cors';
 import Koa from 'koa';
 import Router from 'koa-router';
 import Serve from 'koa-static';
@@ -18,7 +17,7 @@ api_r.use("/api", router.routes());
 
 // Allow CORS in development since the frontend and backend are served separately
 // require is used so that cors is not a production dependency
-if (process.env.TYPE = "development") App.use(cors());
+if (process.env.TYPE == "development") App.use(require('@koa/cors')());
 
 App
     .use(Serve("./res"))

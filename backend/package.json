@@ -11,7 +11,6 @@
   "author": "Liran Piade and Gabrielle Withers",
   "license": "ISC",
   "dependencies": {
-    "@koa/cors": "^3.1.0",
     "axios": "^0.20.0",
     "koa": "^2.13.0",
     "koa-bodyparser": "^4.3.0",
@@ -21,6 +20,7 @@
     "redis": "^3.0.2"
   },
   "devDependencies": {
+    "@koa/cors": "^3.1.0",
     "@types/koa": "^2.11.4",
     "@types/koa-router": "^7.4.1",
     "@types/koa-static": "^4.0.1",
