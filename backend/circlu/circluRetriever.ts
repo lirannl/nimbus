@@ -18,24 +18,26 @@ const redisClient = Redis.createClient();
  * Store data in redis
  * @param data The data to store
  */
-const storeInRedis = (data: Cve[], name: string) => {
-  return redisClient.set(name, JSON.stringify(data));
-}
+const storeInRedis = (data: Cve[], key: string) => new Promise((resolve, reject) => {
+  redisClient.set(key, JSON.stringify(data), (err, success) => {
+    if (success) resolve(success);
+    else reject(err);
+  });
+}) as Promise<"OK">;
 
 // Determine if a given object is an array of Cves
 function isCveArr(obj: any): obj is Cve[] { return true }
 
 /**
- * Reading CVE arrays from redis using promises instead of callbacks
- * @param name The key
+ * Gets CVE arrays from redis using a promise instead of a callback
  */
-const getFromRedis = (name: string) => new Promise((resolve, reject) => {
-  redisClient.get(name, (err, reply) => {
-    if (!reply) reject(err);
+const getFromRedis = (key: string) => new Promise((resolve, reject) => {
+  redisClient.get(key, (err, reply) => {
+    if (!reply) reject(err || new Error("Unknown error."));
     else {
       const replyObj = JSON.parse(reply);
       if (isCveArr(replyObj)) resolve(replyObj);
-      else reject(new Error(`"${name}" does not contain a valid array of CVEs.`));
+      else reject(new Error(`"${key}" does not contain a valid array of CVEs.`));
     }
   });
 }) as Promise<Cve[]>;
@@ -130,7 +132,7 @@ const cvesForDay = async (day: Date) => {
   const relevantCves = allCves.filter(cve => !cve.summary.startsWith("** "));
   // TODO: Entity analysis on the CVEs + storage in S3
 
-  storeInRedis(relevantCves, day.toISOString().split("T")[0]);
+  storeInRedis(relevantCves, getPersKey(day));
   return relevantCves;
 }
 
@@ -141,8 +143,7 @@ const cvesForDay = async (day: Date) => {
  */
 const getCVEs = async (from: Date, to: Date) => {
   const cves = await Promise.all(dateRange(from, to).map(date => cvesForDay(date).then(cves => ({ cves: cves, date: date }))));
-  const getDateString = (date: Date) => date.toISOString().split('T')[0];
-  return cves.reduce((acc, curr) => Object.assign(acc, { [getDateString(curr.date)]: curr.cves }), {} as { [date: string]: Cve[] });
+  return cves.reduce((acc, curr) => Object.assign(acc, { [getPersKey(curr.date)]: curr.cves }), {} as { [date: string]: Cve[] });
 }
 
 export default getCVEs;
