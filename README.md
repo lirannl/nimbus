@@ -1,7 +1,4 @@
 # nimbus
 A scaling cloud application
 # Instructions
-To download the latest nimbus image, run
-    `docker pull docker.pkg.github.com/lirannl/nimbus/nimbus:latest`
-Then, run the image using
-    `docker run --rm -it -p 80:80/tcp docker.pkg.github.com/lirannl/nimbus/nimbus:latest`
+Populate a prod.env file with the environment variables for `REDIS_URL`, and the API keys for Amazon and Google Cloud, then run `docker-compose up`
