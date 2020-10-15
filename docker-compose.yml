@@ -6,7 +6,7 @@ services:
     expose:
     - 6379
   app:
-    build: ./
+    image: docker.pkg.github.com/lirannl/nimbus/nimbus:latest
     ports:
       - 80:80
     env_file:
