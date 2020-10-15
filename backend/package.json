@@ -4,7 +4,7 @@
   "description": "A backend for the Nimbus app",
   "main": "index.ts",
   "scripts": {
-    "start": "npx ts-node-dev --respawn index.ts && clear",
+    "start": "export $(cat backend_dev.env | sed 's/#.*//g' | xargs) && npx ts-node-dev --respawn index.ts && clear",
     "run-prod": "node ./index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

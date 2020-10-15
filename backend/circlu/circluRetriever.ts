@@ -12,7 +12,7 @@ const addDay = (old: Date, amount = 1) => {
   return new Date(old.valueOf() + (msInDay * amount));
 }
 
-const redisClient = Redis.createClient("redis://cache");
+const redisClient = Redis.createClient(process.env.REDIS_URL!);
 
 /**
  * Store data in redis

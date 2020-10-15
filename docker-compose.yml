@@ -1,14 +1,13 @@
-redis:
-  image: redis
-  command: ["redis-server", "--bind", "0.0.0.0", "--port", "6379"]
-  container_name: cache
-  expose:
+services: 
+  redis:
+    image: redis
+    command: ["redis-server", "--bind", "0.0.0.0", "--port", "6379"]
+    container_name: cache
+    expose:
     - 6379
-
-app:
-  build: ./
-  ports:
-    - 80:80
-  env_file:
-    - prod.env
-  command: sh -c "npm run-script run-prod"
+  app:
+    build: ./
+    ports:
+      - 80:80
+    env_file:
+      - prod.env
