@@ -69,7 +69,7 @@ export const storeInS3 = (keyExists:boolean, key: string, data: Cve[]) => new Pr
         s3Client.putObject({ Bucket: bucketName, Key: key, Body: body }, (err, reply) => {
             if (!reply) reject(err || new Error("Unknown error."));
             else {
-                console.log("[!] key added to S3 in " + bucketName + "/" + key);
+                console.log(`[!] key added to S3 in ${bucketName}/${key}`);
                 // TODO check HTTP response code? aws docs on non-error statuses is not that great
                 const replyCode = 200;
                 if (replyCode==200) resolve(replyCode);
