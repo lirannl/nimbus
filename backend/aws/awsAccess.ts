@@ -1,8 +1,9 @@
 import { Cve, Impact, Access } from "../interfaces/cve_interface";
 import { isCveArr }  from '../circlu/circluRetriever';
-
+import Env from 'dotenv';
 import AWS from 'aws-sdk';
-require('dotenv').config({ path: __dirname+'/.env' });
+
+Env.config({ path: __dirname+'/.env' });
 
 let s3Client = new AWS.S3({ apiVersion: '2006-03-01', region: 'ap-southeast-2' })
 // TODO why did the pracs use such an old api version lmao
@@ -19,7 +20,7 @@ export function createBucket() {
             console.log("[!] Nimbus bucket already exists");
             return err.statusCode;
         } else {
-            console.log("[!] Created Nimbus bucket", reply.Location);
+            console.log(`[!] Created Nimbus bucket at ${reply.Location}`);
             return 200;
         }
     })
@@ -51,7 +52,7 @@ export const checkKey = (key: string) => new Promise((resolve, reject) => {
             console.log("[!] key doesn't exist yet");
             resolve(false);
         } else { 
-            console.log("[!] key already in S3 at " + bucketName + "/" + key); 
+            console.log(`[!] key already in S3 at ${bucketName}/${key}`); 
             resolve(true);
         }
     })
