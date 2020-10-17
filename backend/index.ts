@@ -1,16 +1,13 @@
 import Koa from 'koa';
 import Router from 'koa-router';
 import Serve from 'koa-static';
-import getCVEs from './circlu/circluRetriever';
+import main from './routes/main';
 
 const App = new Koa();
 const api_r = new Router();
 const router = new Router();
 
-router.get("/", async (ctx) => {
-    const cves = await getCVEs(new Date(ctx.request.headers["startdate"]), new Date(ctx.request.headers["enddate"]));
-    ctx.response.body = cves;
-});
+router.get("/", main);
 
 // Set the API's prefix to /api
 api_r.use("/api", router.routes());

@@ -11,6 +11,7 @@
   "author": "Liran Piade and Gabrielle Withers",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/language": "^4.1.1",
     "axios": "^0.20.0",
     "koa": "^2.13.0",
     "koa-bodyparser": "^4.3.0",

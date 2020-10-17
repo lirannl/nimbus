@@ -1,6 +1,8 @@
 import Redis from "redis";
 import Axios from "axios";
-import { Cve } from "./cve_interface";
+import { Cve } from "../cve_interface";
+import analyseCves from "../googlecloud/entity_analysis";
+import { removeNulls } from "../utils";
 
 /**
  * Return a date with `amount` many days added
@@ -130,8 +132,9 @@ const cvesForDay = async (day: Date) => {
   const allCves = firstCves.concat(...latterCves);
   // Ignore CVEs that are rejected or disputed
   const relevantCves = allCves.filter(cve => !cve.summary.startsWith("** "));
-  // TODO: Entity analysis on the CVEs + storage in S3
-
+  // Disabled entity analysis temporarily until we sort out how we're going to authenticate
+  //const analysedCves = await analyseCves(relevantCves);
+  // TODO: Storage in S3
   storeInRedis(relevantCves, getPersKey(day));
   return relevantCves;
 }
