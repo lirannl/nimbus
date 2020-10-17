@@ -1,6 +1,7 @@
 import Redis from "redis";
 import Axios from "axios";
 import { Cve } from "../interfaces/cve_interface";
+import { createBucket, getFromS3, storeInS3, checkKey }  from '../aws/awsAccess';
 import analyseCves from "../googlecloud/entity_analysis";
 
 /**
@@ -27,7 +28,7 @@ const storeInRedis = (data: Cve[], key: string) => new Promise((resolve, reject)
 }) as Promise<"OK">;
 
 // Determine if a given object is an array of Cves
-function isCveArr(obj: any): obj is Cve[] { return true }
+export function isCveArr(obj: any): obj is Cve[] { return true }
 
 /**
  * Gets CVE arrays from redis using a promise instead of a callback
@@ -36,6 +37,7 @@ const getFromRedis = (key: string) => new Promise((resolve, reject) => {
   redisClient.get(key, (err, reply) => {
     if (!reply) reject(err || new Error("Unknown error."));
     else {
+      console.log("[!] Grabbing data from redis");
       const replyObj = JSON.parse(reply);
       if (isCveArr(replyObj)) resolve(replyObj);
       else reject(new Error(`"${key}" does not contain a valid array of CVEs.`));
@@ -117,10 +119,21 @@ const cvesForDay = async (day: Date) => {
   try {
     const cves = await getFromRedis(getPersKey(day));
     // Todo: store in S3 here
+    const keyExists = await checkKey(getPersKey(day));
+    await storeInS3(keyExists, getPersKey(day), cves);
     return cves;
+  } catch {
+    // TODO If S3 storing fails, check that the bucket exists
+    //      if doesn't exist, create it and store again
+    //      else return error
+  } try {
+    // Try getting the results from S3
+    console.log("Failed to find key in redis, checking S3 now...")
+    const cves = await getFromS3(getPersKey(day));
+    return cves
+  } catch {
+    console.log("Failed to find key in S3, querying source now...")
   }
-  catch {}
-  // Try getting the results from S3
   const { results: firstCves, total } = await singleCircluReq(day);
   const reqLength = firstCves.length;
   const skips = skipPoints(total, reqLength);
@@ -134,6 +147,7 @@ const cvesForDay = async (day: Date) => {
   // Disabled entity analysis temporarily until we sort out how we're going to authenticate
   //const analysedCves = await analyseCves(relevantCves);
   // TODO: Storage in S3
+  storeInS3(false, getPersKey(day), relevantCves);
   storeInRedis(relevantCves, getPersKey(day));
   return relevantCves;
 }
