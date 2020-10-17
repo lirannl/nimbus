@@ -1,8 +1,7 @@
 import Redis from "redis";
 import Axios from "axios";
-import { Cve } from "../cve_interface";
+import { Cve } from "../interfaces/cve_interface";
 import analyseCves from "../googlecloud/entity_analysis";
-import { removeNulls } from "../utils";
 
 /**
  * Return a date with `amount` many days added

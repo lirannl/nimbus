@@ -1,4 +1,4 @@
-import { Cve } from "../cve_interface";
+import { Cve } from "../interfaces/cve_interface";
 import language from "@google-cloud/language";
 import { google } from "@google-cloud/language/build/protos/protos";
 import { removeNulls } from "../utils";
