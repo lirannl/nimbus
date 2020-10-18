@@ -1,9 +1,9 @@
-import { Cve, Impact, Access } from "../interfaces/cve_interface";
-import { isCveArr }  from '../circlu/circluRetriever';
+import { Cve } from "../interfaces/cve_interface";
 import Env from 'dotenv';
 import AWS from 'aws-sdk';
+import { isCveArr } from "../utils";
 
-Env.config({ path: __dirname+'/.env' });
+Env.config({ path: __dirname + '/.env' });
 
 let s3Client = new AWS.S3({ apiVersion: '2006-03-01', region: 'ap-southeast-2' })
 // TODO why did the pracs use such an old api version lmao
@@ -15,19 +15,21 @@ createBucket(); // TODO not sure if this is the best place to call bucket creati
  * @returns status code of creation request
  */
 export function createBucket() {
-    s3Client.createBucket({ Bucket: bucketName }, function(err, reply) {
-        if (err && err.statusCode == 409){
-            console.debug("[!] Nimbus bucket already exists");
-            return err.statusCode;
-        } else if (err) {
-            console.error("[!] Unhandled S3 bucket error");
-            return err.statusCode;
-        }
-        else {
-            console.debug(`[!] Created Nimbus bucket at ${reply.Location}`);
-            return 200;
-        }
-    })
+    return new Promise<number>((resolve, reject) => {
+        s3Client.createBucket({ Bucket: bucketName }, function (err, reply) {
+            if (err && err.statusCode == 409) {
+                console.debug("[!] Nimbus bucket already exists");
+                resolve(err.statusCode);
+            } else if (err) {
+                console.error("[!] Unhandled S3 bucket error");
+                reject(new Error(`AWS error code: ${err.statusCode}`));
+            }
+            else {
+                console.debug(`[!] Created Nimbus bucket at ${reply.Location}`);
+                resolve(200);
+            }
+        })
+    });
 }
 
 /**
@@ -35,7 +37,7 @@ export function createBucket() {
  * @param key The day to get data for
  */
 export const getFromS3 = (key: string) => new Promise<Cve[]>((resolve, reject) => {
-    s3Client.getObject({ Bucket: bucketName, Key: key}, (err, reply) => {
+    s3Client.getObject({ Bucket: bucketName, Key: key }, (err, reply) => {
         if (!reply) reject(err || new Error("Unknown error."));
         else {
             console.log(`[!] ${key} found in S3`)
@@ -43,7 +45,7 @@ export const getFromS3 = (key: string) => new Promise<Cve[]>((resolve, reject) =
             if (isCveArr(replyObj)) resolve(replyObj);
             else reject(new Error(`"${key}" does not contain a valid array of CVEs.`));
         }
-  });
+    });
 });
 
 /**
@@ -51,12 +53,13 @@ export const getFromS3 = (key: string) => new Promise<Cve[]>((resolve, reject) =
  * @param key Key to check in S3
  */
 export const checkKey = (key: string) => new Promise<boolean>((resolve, reject) => {
-    s3Client.getObject({ Bucket: bucketName, Key: key}, (err, reply) => {
+    s3Client.getObject({ Bucket: bucketName, Key: key }, (err, reply) => {
+        console.error(err);
         if (!reply) {
             console.debug(`[!] ${key} doesn't exist in S3 yet`);
             resolve(false);
-        } else { 
-            console.debug(`[!] ${key} already in S3`); 
+        } else {
+            console.debug(`[!] ${key} already in S3`);
             resolve(true);
         }
     })
@@ -67,9 +70,9 @@ export const checkKey = (key: string) => new Promise<boolean>((resolve, reject) 
  * @param key The day to write data for
  * @param data The data to write
  */
-export const storeInS3 = (keyExists:boolean, key: string, data: Cve[]) => new Promise<number>((resolve, reject) => {
+export const storeInS3 = (keyExists: boolean, key: string, data: Cve[]) => new Promise<number>((resolve, reject) => {
     // keyexists is temp fix while @gaby investigates if overwriting can be disabled on S3
-    if (keyExists === false) {
+    if (!keyExists) {
         const body = JSON?.stringify(data);
         s3Client.putObject({ Bucket: bucketName, Key: key, Body: body }, (err, reply) => {
             if (!reply) reject(err || new Error("Unknown error."));
@@ -77,7 +80,7 @@ export const storeInS3 = (keyExists:boolean, key: string, data: Cve[]) => new Pr
                 console.debug(`[!] ${key} added to S3`);
                 // TODO check HTTP response code? aws docs on non-error statuses is not that great
                 const replyCode = 200;
-                if (replyCode==200) resolve(replyCode);
+                if (replyCode == 200) resolve(replyCode);
                 else reject(new Error(`"${key}" response code was not 200`));
             }
         });

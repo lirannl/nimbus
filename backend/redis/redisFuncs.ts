@@ -1,5 +1,5 @@
 import Redis from "redis";
-import { isCveArr } from "../circlu/circluRetriever";
+import { isCveArr } from "../utils";
 import { Cve } from "../interfaces/cve_interface";
 
 const redisClient = Redis.createClient(process.env.REDIS_URL!);

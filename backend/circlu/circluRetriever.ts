@@ -1,35 +1,9 @@
 import Axios from "axios";
 import { Cve } from "../interfaces/cve_interface";
-import { createBucket, getFromS3, storeInS3, checkKey }  from '../aws/awsAccess';
+import { getFromS3, storeInS3, checkKey }  from '../aws/awsAccess';
 import analyseCves from "../googlecloud/entity_analysis";
 import { getFromRedis, storeInRedis } from "../redis/redisFuncs";
-
-/**
- * Return a date with `amount` many days added
- * @param old Old date
- * @param amount How many days to add (default: 1)
- */
-const addDay = (old: Date, amount = 1) => {
-  const msInDay = 24 * 3600 * 1000;
-  return new Date(old.valueOf() + (msInDay * amount));
-}
-
-// Determine if a given object is an array of Cves
-export function isCveArr(obj: any): obj is Cve[] { return true }
-
-/**
- * Get an array of all dates within the given range
- */
-function dateRange(startDate: Date, stopDate: Date) {
-  const dates = [] as Date[];
-  let currentDate = startDate;
-  while (currentDate <= stopDate) {
-    dates.push(new Date(currentDate));
-    // Increase current Date by 1
-    currentDate = addDay(currentDate);
-  }
-  return dates;
-}
+import { addDay, dateRange, getPersKey } from "../utils";
 
 /**
  * Generates an array of starting points for future querying of the Circlu API
@@ -59,8 +33,6 @@ const recursiveSkipPoints: (
   return recursiveSkipPoints(max, stepSize, newStartPoints);
 };
 
-const getPersKey = (day: Date) => day.toISOString().split("T")[0];
-
 /**
  * Make a single request to Circlu
  * @param day Day to fetch for
@@ -72,7 +44,7 @@ const singleCircluReq = async (day: Date, skip?: number, limit?: number) => {
     }-${date.getFullYear()}`;
   const headersObj = {
     time_start: dateFormatter(day),
-    time_end: dateFormatter(new Date(day.valueOf() + 24 * 3600 * 1000)),
+    time_end: addDay(day),
     time_modifier: "between",
     time_type: "Published",
     skip: skip || 0,
