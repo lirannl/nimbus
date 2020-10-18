@@ -34,7 +34,7 @@ export function createBucket() {
  * Get CVE arrays from the S3 Nimbus bucket using promise
  * @param key The day to get data for
  */
-export const getFromS3 = (key: string) => new Promise((resolve, reject) => {
+export const getFromS3 = (key: string) => new Promise<Cve[]>((resolve, reject) => {
     s3Client.getObject({ Bucket: bucketName, Key: key}, (err, reply) => {
         if (!reply) reject(err || new Error("Unknown error."));
         else {
@@ -44,13 +44,13 @@ export const getFromS3 = (key: string) => new Promise((resolve, reject) => {
             else reject(new Error(`"${key}" does not contain a valid array of CVEs.`));
         }
   });
-}) as Promise<Cve[]>;
+});
 
 /**
  * Check if a given key exists on S3 to avoid overwriting
  * @param key Key to check in S3
  */
-export const checkKey = (key: string) => new Promise((resolve, reject) => {
+export const checkKey = (key: string) => new Promise<boolean>((resolve, reject) => {
     s3Client.getObject({ Bucket: bucketName, Key: key}, (err, reply) => {
         if (!reply) {
             console.debug(`[!] ${key} doesn't exist in S3 yet`);
@@ -60,14 +60,14 @@ export const checkKey = (key: string) => new Promise((resolve, reject) => {
             resolve(true);
         }
     })
-}) as Promise<boolean>;
+});
 
 /**
  * Write a specific item in the S3 Nimbus bucket
  * @param key The day to write data for
  * @param data The data to write
  */
-export const storeInS3 = (keyExists:boolean, key: string, data: Cve[]) => new Promise((resolve, reject) => {
+export const storeInS3 = (keyExists:boolean, key: string, data: Cve[]) => new Promise<number>((resolve, reject) => {
     // keyexists is temp fix while @gaby investigates if overwriting can be disabled on S3
     if (keyExists === false) {
         const body = JSON?.stringify(data);
@@ -85,4 +85,4 @@ export const storeInS3 = (keyExists:boolean, key: string, data: Cve[]) => new Pr
         // TODO
         resolve(404);
     }
-}) as Promise<number>;
+});

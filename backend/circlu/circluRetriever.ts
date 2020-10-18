@@ -1,8 +1,8 @@
-import Redis from "redis";
 import Axios from "axios";
 import { Cve } from "../interfaces/cve_interface";
 import { createBucket, getFromS3, storeInS3, checkKey }  from '../aws/awsAccess';
 import analyseCves from "../googlecloud/entity_analysis";
+import { getFromRedis, storeInRedis } from "../redis/redisFuncs";
 
 /**
  * Return a date with `amount` many days added
@@ -14,36 +14,8 @@ const addDay = (old: Date, amount = 1) => {
   return new Date(old.valueOf() + (msInDay * amount));
 }
 
-const redisClient = Redis.createClient(process.env.REDIS_URL!);
-
-/**
- * Store data in redis
- * @param data The data to store
- */
-const storeInRedis = (data: Cve[], key: string) => new Promise((resolve, reject) => {
-  redisClient.set(key, JSON.stringify(data), (err, success) => {
-    if (success) resolve(success);
-    else reject(err);
-  });
-}) as Promise<"OK">;
-
 // Determine if a given object is an array of Cves
 export function isCveArr(obj: any): obj is Cve[] { return true }
-
-/**
- * Gets CVE arrays from redis using a promise instead of a callback
- */
-const getFromRedis = (key: string) => new Promise((resolve, reject) => {
-  redisClient.get(key, (err, reply) => {
-    if (!reply) reject(err || new Error("Unknown error."));
-    else {
-      console.log(`[!] ${key} found in redis`);
-      const replyObj = JSON.parse(reply);
-      if (isCveArr(replyObj)) resolve(replyObj);
-      else reject(new Error(`"${key}" does not contain a valid array of CVEs.`));
-    }
-  });
-}) as Promise<Cve[]>;
 
 /**
  * Get an array of all dates within the given range
@@ -132,10 +104,9 @@ const cvesForDay = async (day: Date) => {
     console.log(`Failed to find ${getPersKey(day)} in S3, querying source now...`)
   }
   const { results: firstCves, total } = await singleCircluReq(day);
-  const reqLength = firstCves.length;
-  const skips = skipPoints(total, reqLength);
-  const latterCves = await Promise.all(skips.map(
-    skip => singleCircluReq(day, skip, reqLength).then(res => res.results)
+  const cvesPerReq = firstCves.length;
+  const latterCves = await Promise.all(skipPoints(total, cvesPerReq).map(
+    skip => singleCircluReq(day, skip, cvesPerReq).then(res => res.results)
   ));
   // Add all of the CVEs together into a single array
   const allCves = firstCves.concat(...latterCves);
