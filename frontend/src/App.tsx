@@ -1,5 +1,6 @@
 import React from 'react';
 import './App.css';
+import { makeChart } from './amcharts/wordCloud'
 
 const API = process.env.REACT_APP_API || "/api";
 
@@ -19,8 +20,13 @@ const buttonResponder = async (event: React.FormEvent<HTMLFormElement>, dataSett
     }, headers)
   });
   const data = await res.json();
+  makeChart(data);
+  const test = document.querySelector<HTMLElement>('#chartdiv')!;
+  test.style.backgroundColor = 'white';
   dataSetter(data);
 }
+
+
 
 function App() {
   const [data, setData] = React.useState({} as { [date: string]: any[] });
@@ -32,7 +38,12 @@ function App() {
           to:<input type="date" /><br/>
           <input type="submit" />
         </form>
-        {Object.entries(data).map(day => day[1].map((val, index) => <div key={`${day[0]}-${index}`}>{val.summary}</div>))}
+        <div id="chartdiv"></div>
+        {Object.entries(data).map( day => 
+          day[1].map((val, index) => 
+            <div key={`${day[0]}-${index}`}>{val.Published} {val.cwe} {val.summary}</div>
+          )
+        )}
       </header>
     </div>
   );
