@@ -37,7 +37,7 @@ const getFromRedis = (key: string) => new Promise((resolve, reject) => {
   redisClient.get(key, (err, reply) => {
     if (!reply) reject(err || new Error("Unknown error."));
     else {
-      console.log("[!] Grabbing data from redis");
+      console.log(`[!] ${key} found in redis`);
       const replyObj = JSON.parse(reply);
       if (isCveArr(replyObj)) resolve(replyObj);
       else reject(new Error(`"${key}" does not contain a valid array of CVEs.`));
@@ -117,22 +117,19 @@ const singleCircluReq = async (day: Date, skip?: number, limit?: number) => {
 const cvesForDay = async (day: Date) => {
   // Persistent sources will return all CVEs for the given day immediately, therefore, no further fetches are needed.
   try {
+    // Try getting the results from Redis
     const cves = await getFromRedis(getPersKey(day));
-    // Todo: store in S3 here
     const keyExists = await checkKey(getPersKey(day));
     await storeInS3(keyExists, getPersKey(day), cves);
     return cves;
-  } catch {
-    // TODO If S3 storing fails, check that the bucket exists
-    //      if doesn't exist, create it and store again
-    //      else return error
-  } try {
+  } catch { } 
+  try {
     // Try getting the results from S3
-    console.log("Failed to find key in redis, checking S3 now...")
+    console.log(`Failed to find ${getPersKey(day)} in redis, checking S3 now...`)
     const cves = await getFromS3(getPersKey(day));
     return cves
   } catch {
-    console.log("Failed to find key in S3, querying source now...")
+    console.log(`Failed to find ${getPersKey(day)} in S3, querying source now...`)
   }
   const { results: firstCves, total } = await singleCircluReq(day);
   const reqLength = firstCves.length;
@@ -146,7 +143,6 @@ const cvesForDay = async (day: Date) => {
   const relevantCves = allCves.filter(cve => !cve.summary.startsWith("** "));
   // Disabled entity analysis temporarily until we sort out how we're going to authenticate
   //const analysedCves = await analyseCves(relevantCves);
-  // TODO: Storage in S3
   storeInS3(false, getPersKey(day), relevantCves);
   storeInRedis(relevantCves, getPersKey(day));
   return relevantCves;

@@ -17,10 +17,14 @@ createBucket(); // TODO not sure if this is the best place to call bucket creati
 export function createBucket() {
     s3Client.createBucket({ Bucket: bucketName }, function(err, reply) {
         if (err && err.statusCode == 409){
-            console.log("[!] Nimbus bucket already exists");
+            console.debug("[!] Nimbus bucket already exists");
             return err.statusCode;
-        } else {
-            console.log(`[!] Created Nimbus bucket at ${reply.Location}`);
+        } else if (err) {
+            console.error("[!] Unhandled S3 bucket error");
+            return err.statusCode;
+        }
+        else {
+            console.debug(`[!] Created Nimbus bucket at ${reply.Location}`);
             return 200;
         }
     })
@@ -34,7 +38,7 @@ export const getFromS3 = (key: string) => new Promise((resolve, reject) => {
     s3Client.getObject({ Bucket: bucketName, Key: key}, (err, reply) => {
         if (!reply) reject(err || new Error("Unknown error."));
         else {
-            console.log("[!] found in S3")
+            console.log(`[!] ${key} found in S3`)
             const replyObj = JSON.parse(reply?.Body?.toString('utf-8')!)!;
             if (isCveArr(replyObj)) resolve(replyObj);
             else reject(new Error(`"${key}" does not contain a valid array of CVEs.`));
@@ -49,10 +53,10 @@ export const getFromS3 = (key: string) => new Promise((resolve, reject) => {
 export const checkKey = (key: string) => new Promise((resolve, reject) => {
     s3Client.getObject({ Bucket: bucketName, Key: key}, (err, reply) => {
         if (!reply) {
-            console.log("[!] key doesn't exist yet");
+            console.debug(`[!] ${key} doesn't exist in S3 yet`);
             resolve(false);
         } else { 
-            console.log(`[!] key already in S3 at ${bucketName}/${key}`); 
+            console.debug(`[!] ${key} already in S3`); 
             resolve(true);
         }
     })
@@ -70,7 +74,7 @@ export const storeInS3 = (keyExists:boolean, key: string, data: Cve[]) => new Pr
         s3Client.putObject({ Bucket: bucketName, Key: key, Body: body }, (err, reply) => {
             if (!reply) reject(err || new Error("Unknown error."));
             else {
-                console.log(`[!] key added to S3 in ${bucketName}/${key}`);
+                console.debug(`[!] ${key} added to S3`);
                 // TODO check HTTP response code? aws docs on non-error statuses is not that great
                 const replyCode = 200;
                 if (replyCode==200) resolve(replyCode);
