@@ -1,1 +1,2 @@
-shared/prod.env
+shared/*
+!shared/nonsecret.env
