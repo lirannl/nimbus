@@ -51,7 +51,7 @@ export const getFromS3 = (key: string) => new Promise<Cve[]>((resolve, reject) =
  */
 export const checkKey = (key: string) => new Promise<boolean>((resolve, reject) => {
     s3Client.getObject({ Bucket: bucketName, Key: key }, (err, reply) => {
-        console.error(err);
+        // console.error(err);
         if (!reply) {
             console.debug(`[!] ${key} doesn't exist in S3 yet`);
             resolve(false);

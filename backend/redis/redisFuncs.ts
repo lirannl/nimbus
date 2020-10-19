@@ -10,8 +10,10 @@ const redisClient = Redis.createClient(process.env.REDIS_URL!);
  */
 export const storeInRedis = (data: Cve[], key: string) => new Promise<"OK">((resolve, reject) => {
   redisClient.set(key, JSON.stringify(data), (err, success) => {
-    if (success) resolve(success);
-    else reject(err);
+    if (success) {
+      console.debug(`[!] ${key} added to redis`);
+      resolve(success);
+    } else reject(err);
   });
 });
 

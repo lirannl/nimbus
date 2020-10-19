@@ -68,6 +68,7 @@ const cvesForDay = async (day: Date) => {
     // Try getting the results from S3
     console.log(`Failed to find ${getPersKey(day)} in redis, checking S3 now...`)
     const cves = await getFromS3(getPersKey(day));
+    storeInRedis(cves, getPersKey(day));
     return cves
   } catch {
     console.log(`Failed to find ${getPersKey(day)} in S3, querying source now...`)
