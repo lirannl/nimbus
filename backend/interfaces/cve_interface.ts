@@ -14,9 +14,6 @@ export interface Cve {
     "last-modified":                  Date;
     references:                       string[];
     summary:                          string;
-    vulnerable_configuration:         string[];
-    vulnerable_configuration_cpe_2_2: any[];
-    vulnerable_product:               string[];
     entities?: google.cloud.language.v1.IEntity[];
 }
 

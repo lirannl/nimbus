@@ -39,7 +39,7 @@ const recursiveSkipPoints: (
  * @param skip How many CVEs to skip
  */
 const singleCircluReq = async (day: Date, skip?: number, limit?: number) => {
-  const makeDateString = (day: Date) => `${`${day.getDate()}`.padStart(2, '0')}-${`${day.getMonth()+1}`.padStart(2, '0')}-${day.getFullYear()}`;
+  const makeDateString = (day: Date) => `${`${day.getDate()}`.padStart(2, '0')}-${`${day.getMonth() + 1}`.padStart(2, '0')}-${day.getFullYear()}`;
   const headersObj = {
     time_start: makeDateString(day),
     time_end: makeDateString(addDay(day)),
@@ -48,8 +48,16 @@ const singleCircluReq = async (day: Date, skip?: number, limit?: number) => {
     skip: skip || 0,
   };
   if (limit) Object.assign(headersObj, { limit: limit });
-  const res = await Axios("https://cve.circl.lu/api/query", { headers: headersObj});
-  return res.data as { results: Cve[], total: number };
+  const res = await Axios("https://cve.circl.lu/api/query", { headers: headersObj });
+  const data: {results: (Cve & {
+    vulnerable_configuration: string[],
+    vulnerable_configuration_cpe_2_2: any[],
+    vulnerable_product: string[]
+  })[], total: number} = res.data;
+  return {total: data.total, results: data.results.map(val => {
+    const {vulnerable_configuration, vulnerable_configuration_cpe_2_2, vulnerable_product, references, ...cve} = val;
+    return Object.assign({},cve,{references: references.slice(0, 3)});
+  })}
 }
 
 /**
