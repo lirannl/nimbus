@@ -8,6 +8,7 @@ services:
   app:
     volumes: 
       - ./shared:/shared
-    image: docker.pkg.github.com/lirannl/nimbus/nimbus:latest
+    build: ./
     ports:
       - 80:80
+

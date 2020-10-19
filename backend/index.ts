@@ -1,10 +1,13 @@
+import Env from 'dotenv';
+// Load production environment files
+Env.config({path: "/shared/nonsecret.env"});
+Env.config({path: "/shared/prod.env"});
+
 import Koa from 'koa';
 import Router from 'koa-router';
 import Serve from 'koa-static';
 import main from './routes/main';
-import Env from 'dotenv';
 
-Env.config({path: "/shared/nonsecret.env"});
 const App = new Koa();
 const api_r = new Router();
 const router = new Router();
