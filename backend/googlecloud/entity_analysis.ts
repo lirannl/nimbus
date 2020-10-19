@@ -1,7 +1,7 @@
 import { Cve } from "../interfaces/cve_interface";
 import language from "@google-cloud/language";
 import { google } from "@google-cloud/language/build/protos/protos";
-import { removeNulls } from "../utils";
+import { delay, removeNulls } from "../utils";
 
 const client = new language.LanguageServiceClient();
 
@@ -22,11 +22,26 @@ const textPacker: (text: string) => google.cloud.language.v1.IAnalyzeEntitiesReq
  * @param cve The cve to analyse
  */
 const analysedCve = async (cve: Cve) => {
-    const [{ entities }] = await client.analyzeEntities(textPacker(cve.summary));
+    let obtained = false;
+    let first = true;
+    let entities: google.cloud.language.v1.IEntity[] | null | undefined;
+    while (!obtained) {
+        try {
+            if (!first) await delay(60); // Wait a minute
+            [{ entities }] = await client.analyzeEntities(textPacker(cve.summary));
+            obtained = true;
+        }
+        catch (e) {
+            console.log(e);
+        }
+        finally { first = false; }
+    }
     if (!entities || entities.length == 0) return null;
     return Object.assign(cve, { entities: entities });
 };
 
-const analyseCves = async (cves: Cve[]) => removeNulls(await Promise.all(cves.map(analysedCve)));
+const analyseCves = async (cves: Cve[]) => { 
+    return removeNulls(await Promise.all(cves.map(analysedCve))) 
+};
 
 export default analyseCves;

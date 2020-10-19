@@ -2,7 +2,8 @@ import { Cve } from "../interfaces/cve_interface";
 import AWS from 'aws-sdk';
 import { isCveArr } from "../utils";
 
-let s3Client = new AWS.S3({ apiVersion: '2006-03-01', region: 'ap-southeast-2' })
+let s3Client = new AWS.S3({ apiVersion: '2006-03-01', region: 'ap-southeast-2', credentials: 
+{ accessKeyId: process.env.AWS_ACCESS_KEY_ID!, secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!} })
 // TODO why did the pracs use such an old api version lmao
 const bucketName = 'nimbus-store5';
 createBucket(); // TODO not sure if this is the best place to call bucket creation

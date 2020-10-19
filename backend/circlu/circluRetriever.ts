@@ -39,9 +39,10 @@ const recursiveSkipPoints: (
  * @param skip How many CVEs to skip
  */
 const singleCircluReq = async (day: Date, skip?: number, limit?: number) => {
+  const makeDateString = (day: Date) => `${`${day.getDate()}`.padStart(2, '0')}-${`${day.getMonth()+1}`.padStart(2, '0')}-${day.getFullYear()}`;
   const headersObj = {
-    time_start: getPersKey(day),
-    time_end: getPersKey(addDay(day)),
+    time_start: makeDateString(day),
+    time_end: makeDateString(addDay(day)),
     time_modifier: "between",
     time_type: "Published",
     skip: skip || 0,
@@ -82,6 +83,7 @@ const cvesForDay = async (day: Date) => {
   const allCves = firstCves.concat(...latterCves);
   // Ignore CVEs that are rejected or disputed
   const relevantCves = allCves.filter(cve => !cve.summary.startsWith("** "));
+  console.debug(`Finished getting ${relevantCves.length} cves for ${day.toDateString()}.`);
   // Disabled entity analysis temporarily until we sort out how we're going to authenticate
   const analysedCves = await analyseCves(relevantCves);
   storeInS3(false, getPersKey(day), analysedCves);
