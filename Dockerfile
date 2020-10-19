@@ -19,6 +19,9 @@ COPY --from=transpilation /backend/package.json .
 RUN npm install --production
 # Add static resources
 COPY --from=frontend_compile /frontend/build ./res
+RUN mkdir -p /root/.aws
+RUN touch /root/.aws/credentials
+RUN touch /root/.aws/config
 # Set up production envrionment variables
 ENV TYPE=production
 ENV PORT=80
