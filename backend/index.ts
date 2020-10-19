@@ -2,6 +2,7 @@ import Env from 'dotenv';
 // Load production environment files
 Env.config({path: "/shared/nonsecret.env"});
 Env.config({path: "/shared/prod.env"});
+Env.config({path: `${__dirname}/../shared/dev.env`});
 
 import Koa from 'koa';
 import Router from 'koa-router';

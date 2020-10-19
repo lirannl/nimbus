@@ -1,9 +1,6 @@
 import { Cve } from "../interfaces/cve_interface";
-import Env from 'dotenv';
 import AWS from 'aws-sdk';
 import { isCveArr } from "../utils";
-
-Env.config({ path: __dirname + '/.env' });
 
 let s3Client = new AWS.S3({ apiVersion: '2006-03-01', region: 'ap-southeast-2' })
 // TODO why did the pracs use such an old api version lmao

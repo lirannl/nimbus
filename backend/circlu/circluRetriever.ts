@@ -1,6 +1,6 @@
 import Axios from "axios";
 import { Cve } from "../interfaces/cve_interface";
-import { getFromS3, storeInS3, checkKey }  from '../aws/awsAccess';
+import { getFromS3, storeInS3, checkKey } from '../aws/awsAccess';
 import analyseCves from "../googlecloud/entity_analysis";
 import { getFromRedis, storeInRedis } from "../redis/redisFuncs";
 import { addDay, dateRange, getPersKey } from "../utils";
@@ -39,19 +39,16 @@ const recursiveSkipPoints: (
  * @param skip How many CVEs to skip
  */
 const singleCircluReq = async (day: Date, skip?: number, limit?: number) => {
-  const dateFormatter = (date: Date) => `${`${date.getDate()}`.padStart(2, '0')
-    }-${`${date.getMonth() + 1}`.padStart(2, '0')
-    }-${date.getFullYear()}`;
   const headersObj = {
-    time_start: dateFormatter(day),
-    time_end: addDay(day),
+    time_start: getPersKey(day),
+    time_end: getPersKey(addDay(day)),
     time_modifier: "between",
     time_type: "Published",
     skip: skip || 0,
   };
   if (limit) Object.assign(headersObj, { limit: limit });
-  return (await Axios("https://cve.circl.lu/api/query", { headers: headersObj })).data as
-    { results: Cve[], total: number };
+  const res = await Axios("https://cve.circl.lu/api/query", { headers: headersObj});
+  return res.data as { results: Cve[], total: number };
 }
 
 /**
@@ -66,7 +63,7 @@ const cvesForDay = async (day: Date) => {
     const keyExists = await checkKey(getPersKey(day));
     await storeInS3(keyExists, getPersKey(day), cves);
     return cves;
-  } catch { } 
+  } catch { }
   try {
     // Try getting the results from S3
     console.log(`Failed to find ${getPersKey(day)} in redis, checking S3 now...`)
@@ -85,10 +82,10 @@ const cvesForDay = async (day: Date) => {
   // Ignore CVEs that are rejected or disputed
   const relevantCves = allCves.filter(cve => !cve.summary.startsWith("** "));
   // Disabled entity analysis temporarily until we sort out how we're going to authenticate
-  //const analysedCves = await analyseCves(relevantCves);
-  storeInS3(false, getPersKey(day), relevantCves);
-  storeInRedis(relevantCves, getPersKey(day));
-  return relevantCves;
+  const analysedCves = await analyseCves(relevantCves);
+  storeInS3(false, getPersKey(day), analysedCves);
+  storeInRedis(analysedCves, getPersKey(day));
+  return analysedCves;
 }
 
 /**
