@@ -32,16 +32,17 @@ const analysedCve = async (cve: Cve) => {
             obtained = true;
         }
         catch (e) {
-            console.log(e);
-        }
+            if (e.code == 8) console.debug("Rate limited. Waiting a minute before trying again.");
+            else throw e
+        } 
         finally { first = false; }
     }
     if (!entities || entities.length == 0) return null;
     return Object.assign(cve, { entities: entities });
 };
 
-const analyseCves = async (cves: Cve[]) => { 
-    return removeNulls(await Promise.all(cves.map(analysedCve))) 
+const analyseCves = async (cves: Cve[]) => {
+    return removeNulls(await Promise.all(cves.map(analysedCve)))
 };
 
 export default analyseCves;
