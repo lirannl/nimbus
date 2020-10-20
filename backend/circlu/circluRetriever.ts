@@ -105,8 +105,8 @@ const cvesForDay = async (day: Date) => {
  * @param to Time to fetch until
  */
 const getCVEs = async (from: Date, to: Date) => {
-  const cves = await Promise.all(dateRange(from, to).map(date => cvesForDay(date).then(cves => ({ cves: cves, date: date }))));
-  return cves.reduce((acc, curr) => Object.assign(acc, { [getPersKey(curr.date)]: curr.cves }), {} as { [date: string]: Cve[] });
+  const cves = await Promise.all(dateRange(from, to).map(date => cvesForDay(date)));
+  return ([] as Cve[]).concat(...cves);
 }
 
 export default getCVEs;
