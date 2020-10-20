@@ -20,10 +20,10 @@ const buttonResponder = async (event: React.FormEvent<HTMLFormElement>, dataSett
     }, headers)
   });
   const data = await res.json();
-  makeChart(data);
-  const test = document.querySelector<HTMLElement>('#chartdiv')!;
-  test.style.backgroundColor = 'white';
+  // const test = document.querySelector<HTMLElement>('#chartdiv')!;
+  // test.style.backgroundColor = 'white';
   dataSetter(data);
+  makeChart(data);
 }
 
 
@@ -33,17 +33,42 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <form onSubmit={event => buttonResponder(event, setData)}>
+        <nav className="navbar navbar-light bg-light tempNav" >
+          <a className="navbar-brand" href="/">
+            <b>.*. NIMBUS</b>
+          </a>
+          <button type="button" data-toggle="modal" data-target="#myModal" className="btn btn-secondary my-2 my-sm-0" >&nbsp;<b>?</b>&nbsp;</button>
+        </nav>
+        <div className="container"><div className="modal" id="myModal">
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header"><h4 className="modal-title">Getting Started</h4>
+                <button type="button" className="close" data-dismiss="modal">&times;</button></div>
+                <div className="modal-body">
+                  <p><b>Welcome to Nimbus!</b></p>
+                  <ul>
+                    <li>TODO</li>
+                    <li>...</li>
+                  </ul>
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-secondary" data-dismiss="modal"><b>Close</b></button></div>
+                </div>
+            </div>
+          </div>
+        </div>
+        {<form onSubmit={event => buttonResponder(event, setData)}>
           from:<input type="date" /><br />
           to:<input type="date" /><br/>
           <input type="submit" />
-        </form>
+        </form>}
         <div id="chartdiv"></div>
-        {Object.entries(data).map( day => 
+        {/* {Object.entries(data).map( day => 
           day[1].map((val, index) => 
             <div key={`${day[0]}-${index}`}>{val.Published} {val.cwe} {val.summary}</div>
           )
-        )}
+        )} */}
+        <div className="container"><p>&copy; 2020 <b>NIMBUS</b></p></div>
       </header>
     </div>
   );
