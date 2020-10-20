@@ -2,6 +2,7 @@ import '../App.css';
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4plugins_wordCloud from "@amcharts/amcharts4/plugins/wordCloud"; 
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
+import { Cve } from '../interfaces/cve_interface';
 
 am4core.useTheme(am4themes_animated);
 
@@ -54,18 +55,22 @@ export interface keywordMap {
  * @param data Original data from API
  * @returns { keyword: { "count": count, "avgSeverity": avgSeverity, "cveList": string[] } }
  */
-function getCommonWords(data: any[]) {
+function getCommonWords(data: Cve[]) {
     let keywordMap: keywordMap = {};
     let totalCVEs = 0;
     let totalEntitiesCount = 0;
-    Object.entries(data).map( day => {
-        console.debug(`Number of CVEs for ${day[0]}: ${day[1].length}`);
+    console.log(`data: ${data}`);
+
+    data.map( //day => {
+        // console.debug(`Number of CVEs for ${day[0]}: ${day[1].length}`);
         // For each CVE of current day, get top 3 salient entities
-        day[1].map((cve_interface: any, index: string) => {
+        //day[1].map(
+        (cve_interface, index) => {
+            console.log(data[0]);
             totalCVEs++;
             let entityPerCVECount = 0;
             // For each entity in the cve data
-            return cve_interface.entities.forEach((entity: any, index: string) => {
+            return cve_interface.entities.forEach((entity, index) => {
                 if (entityPerCVECount < 3) {
                     if (entity.type !== "NUMBER") {
                         entityPerCVECount++;
@@ -85,7 +90,7 @@ function getCommonWords(data: any[]) {
                     }
                 }
             });
-        })
+        // })
         console.debug(`total CVEs for time period: ${totalCVEs}`);
         // console.debug(`total keywords for time period: ${totalEntitiesCount}`);
     })
@@ -116,7 +121,7 @@ function sortKeywords(keywordMap: keywordMap) {
  * @param data The CVE data to build the world cloud from
  * @returns 50 keywords in am4plugins_wordCloud.WordCloud form
  */
-export function makeChart(data: any[])  {
+export function makeChart(data: Cve[])  {
     let keywordSeries = setWordCloud();
     let words: any = [];
     let keywordMap = getCommonWords(data);
@@ -127,6 +132,6 @@ export function makeChart(data: any[])  {
             "avgSeverity": value.avgSeverity
         })
       }); 
-    keywordSeries.data = words; //.slice(0,50);
+    keywordSeries.data = words.slice(0,100);
     return keywordSeries;
 }
