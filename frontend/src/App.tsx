@@ -33,9 +33,9 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <nav className="navbar navbar-light bg-light tempNav" >
+        <nav className="navbar navbar-light bg-light navBar" >
           <a className="navbar-brand" href="/">
-            <b>.*. NIMBUS</b>
+            <b>.*. NIMBUS</b> 
           </a>
           <button type="button" data-toggle="modal" data-target="#myModal" className="btn btn-secondary my-2 my-sm-0" >&nbsp;<b>?</b>&nbsp;</button>
         </nav>
@@ -57,18 +57,21 @@ function App() {
             </div>
           </div>
         </div>
-        {<form onSubmit={event => buttonResponder(event, setData)}>
-          from:<input type="date" /><br />
-          to:<input type="date" /><br/>
-          <input type="submit" />
-        </form>}
-        <div id="chartdiv"></div>
+        <div id="mainContent">
+          {<form id="form" onSubmit={event => buttonResponder(event, setData)}>
+            <div className="formItem">from:<input type="date" /></div>
+            <div className="formItem">to:<input type="date" /></div>
+            <div className="formItem" id="submitBtn"><input type="submit"  /></div>
+          </form>}
+          <div id="chartdiv"></div>
+        </div>
         {/* {Object.entries(data).map( day => 
           day[1].map((val, index) => 
             <div key={`${day[0]}-${index}`}>{val.Published} {val.cwe} {val.summary}</div>
           )
         )} */}
-        <div className="container"><p>&copy; 2020 <b>NIMBUS</b></p></div>
+        <div id="footer">
+          <p>&copy; 2020 <b>NIMBUS</b></p></div>
       </header>
     </div>
   );

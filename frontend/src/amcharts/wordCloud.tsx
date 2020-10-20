@@ -5,38 +5,42 @@ import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 
 am4core.useTheme(am4themes_animated);
 
-const wordCloud = am4core.create("chartdiv", am4plugins_wordCloud.WordCloud);
-wordCloud.fontFamily = "Courier New";
-const keywordSeries = wordCloud.series.push(new am4plugins_wordCloud.WordCloudSeries() as any);
-keywordSeries.minFontSize = "50%";
-keywordSeries.minFontSize = "100%";
-keywordSeries.randomness = 0.0;
-keywordSeries.rotationThreshold = 0.5;
-keywordSeries.dataFields.word = "cveTag";
-keywordSeries.dataFields.value = "avgSeverity";
-// keywordSeries.dataFields.tag = "cweTag";
-keywordSeries.heatRules.push({
-    "target": keywordSeries.labels.template,
-    "property": "fill",
-    "min": am4core.color("#0000CC"),
-    "max": am4core.color("#CC00CC"),
-    "dataField": "value"
-});
+function setWordCloud() {
+    const wordCloud = am4core.create("chartdiv", am4plugins_wordCloud.WordCloud);
+    wordCloud.fontFamily = "Courier New";
+    const keywordSeries = wordCloud.series.push(new am4plugins_wordCloud.WordCloudSeries() as any);
+    keywordSeries.minFontSize = "50%";
+    // keywordSeries.maxFontSize = "100%";
+    keywordSeries.randomness = 0.6;
+    keywordSeries.rotationThreshold = 0.0;
+    keywordSeries.dataFields.word = "cveTag";
+    keywordSeries.dataFields.value = "avgSeverity";
+    // keywordSeries.dataFields.tag = "cweTag";
+    keywordSeries.heatRules.push({
+        "target": keywordSeries.labels.template,
+        "property": "fill",
+        "min": am4core.color("#0000CC"),
+        "max": am4core.color("#CC00CC"),
+        "dataField": "value"
+    });
+    
+    // const regexp = new RegExp('CWE-([0-9]{3})');
+    keywordSeries.labels.template.url = `https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword={word}`;
+    // keywordSeries.labels.template.url = `https://cwe.mitre.org/data/definitions/${"{word}".match(regexp) as any [0]}.html`;
+    // keywordSeries.labels.template.url = "https://cwe.mitre.org/data/definitions/{word}.html";
+    keywordSeries.labels.template.urlTarget = "_blank";
+    keywordSeries.labels.template.tooltipText = "Avg Severity: {value}";
+    let hoverState = keywordSeries.labels.template.states.create("hover");
+    hoverState.properties.fill = am4core.color("#FF0000");
+    // let subtitle = chart.titles.create();
+    // subtitle.text = "(click to open)";
+    // let title = chart.titles.create();
+    // title.text = "Most Popular Tags @ StackOverflow";
+    // title.fontSize = 20;
+    // title.fontWeight = "800";
+    return keywordSeries;
+}
 
-// const regexp = new RegExp('CWE-([0-9]{3})');
-keywordSeries.labels.template.url = `https://cve.mitre.org/cgi-bin/cvekey.cgi?keyword={word}`;
-// keywordSeries.labels.template.url = `https://cwe.mitre.org/data/definitions/${"{word}".match(regexp) as any [0]}.html`;
-// keywordSeries.labels.template.url = "https://cwe.mitre.org/data/definitions/{word}.html";
-keywordSeries.labels.template.urlTarget = "_blank";
-keywordSeries.labels.template.tooltipText = "Avg Severity: {value}";
-let hoverState = keywordSeries.labels.template.states.create("hover");
-hoverState.properties.fill = am4core.color("#FF0000");
-// let subtitle = chart.titles.create();
-// subtitle.text = "(click to open)";
-// let title = chart.titles.create();
-// title.text = "Most Popular Tags @ StackOverflow";
-// title.fontSize = 20;
-// title.fontWeight = "800";
 
 export interface keywordMap {
     [keyword: string]: {
@@ -113,6 +117,7 @@ function sortKeywords(keywordMap: keywordMap) {
  * @returns 50 keywords in am4plugins_wordCloud.WordCloud form
  */
 export function makeChart(data: any[])  {
+    let keywordSeries = setWordCloud();
     let words: any = [];
     let keywordMap = getCommonWords(data);
     let sortedKeywords = sortKeywords(keywordMap);
@@ -122,6 +127,6 @@ export function makeChart(data: any[])  {
             "avgSeverity": value.avgSeverity
         })
       }); 
-    keywordSeries.data = words.slice(0,50);
-    return wordCloud;
+    keywordSeries.data = words; //.slice(0,50);
+    return keywordSeries;
 }
