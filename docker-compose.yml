@@ -1,14 +1,16 @@
+version: "3"
 services: 
   redis:
-    image: redis
+    image: "redis"
     command: ["redis-server", "--bind", "0.0.0.0", "--port", "6379"]
-    container_name: cache
+    container_name: "cache"
     expose:
-    - 6379
+      - "6379"
+    restart: always
   app:
     volumes: 
       - ./shared:/shared
     image: docker.pkg.github.com/lirannl/nimbus/nimbus:latest
     ports:
-      - 80:80
-
+      - "80:80"
+    restart: always
