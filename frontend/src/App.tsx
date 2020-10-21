@@ -20,8 +20,6 @@ const buttonResponder = async (event: React.FormEvent<HTMLFormElement>, dataSett
     }, headers)
   });
   const data = await res.json();
-  // const test = document.querySelector<HTMLElement>('#chartdiv')!;
-  // test.style.backgroundColor = 'white';
   dataSetter(data);
   makeChart(data);
 }
