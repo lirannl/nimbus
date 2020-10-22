@@ -39,3 +39,19 @@ export interface Impact {
     confidentiality: string;
     integrity:       string;
 }
+
+export interface nimbus_interface {
+    rawData: Cve[];
+    processedData: {
+        [keyword: string]: {
+            count: number;
+            severity: number[];
+            cves: {
+                [cveTag: string]: {
+                    Published: Date;
+                    severity: number;
+                }
+            }
+        }
+    }
+}
