@@ -92,7 +92,6 @@ const cvesForDay = async (day: Date) => {
   // Ignore CVEs that are rejected or disputed
   const relevantCves = allCves.filter(cve => !cve.summary.startsWith("** "));
   console.debug(`Finished getting ${relevantCves.length} cves for ${day.toDateString()}.`);
-  // Disabled entity analysis temporarily until we sort out how we're going to authenticate
   const analysedCves = await analyseCves(relevantCves);
   storeInS3(false, getPersKey(day), analysedCves);
   storeInRedis(analysedCves, getPersKey(day));

@@ -1,11 +1,12 @@
 import React from 'react';
 import './App.css';
 import { makeChart } from './amcharts/wordCloud'
+import { Cve } from './interfaces/cve_interface';
 
 const API = process.env.REACT_APP_API || "/api";
 
 const buttonResponder = async (event: React.FormEvent<HTMLFormElement>, dataSetter: React.Dispatch<React.SetStateAction<{
-  [date: string]: any[];
+  [date: string]: Cve[];
 }>>) => {
   event.preventDefault();
   const formElements = event.target as unknown as HTMLInputElement[];
@@ -24,10 +25,8 @@ const buttonResponder = async (event: React.FormEvent<HTMLFormElement>, dataSett
   makeChart(data);
 }
 
-
-
 function App() {
-  const [data, setData] = React.useState({} as { [date: string]: any[] });
+  const [data, setData] = React.useState({} as { [date: string]: Cve[] });
   return (
     <div className="App">
       <header className="App-header">
@@ -63,11 +62,6 @@ function App() {
           </form>}
           <div id="chartdiv"></div>
         </div>
-        {/* {Object.entries(data).map( day => 
-          day[1].map((val, index) => 
-            <div key={`${day[0]}-${index}`}>{val.Published} {val.cwe} {val.summary}</div>
-          )
-        )} */}
         <div id="footer">
           <p>&copy; 2020 <b>NIMBUS</b></p></div>
       </header>
