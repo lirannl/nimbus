@@ -13,7 +13,7 @@ function buildSeverityBtn(severity: number) {
     } else if (severity >= 7.0 && severity <= 8.9) {
         return <span className="badge badge-warning" style={{ backgroundColor: "darkorange"}}>{severity} High</span>
     } else {
-        return <span className="badge badge-danger">{severity} High</span>
+        return <span className="badge badge-danger">{severity} Critical</span>
     }
 }
 

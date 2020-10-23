@@ -71,7 +71,7 @@ body {
   height: 70%;
 }
 
-#row2-charts {
+/* #row2-charts {
   display: flex;
 }
 
@@ -81,12 +81,17 @@ body {
 
 #row2-2 {
   outline: 2px solid black;
+} */
+
+.row {
+  height: 30vh;
 }
-#scrollable {
+
+/* #scrollable {
   height: 35vh;
   overflow: scroll;
   margin: 0 20px;
-}
+} */
 
 #footer {
   font-size: 20px;

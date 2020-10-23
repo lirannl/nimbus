@@ -59,40 +59,40 @@ function getCommonWords(data: Cve[]) {
     let keywordMap: keywordMap = {};
     // let totalCVEs = 0;
     // let totalEntitiesCount = 0;
-    console.log(`data: ${data}`);
+    // console.log(`data: ${data}`);
     data.map((cve_interface, index) => {
-            console.log(data[0]);
-            // totalCVEs++;
-            let entityPerCVECount = 0;
-            // For each entity in the cve data
-            return cve_interface.entities.forEach((entity, index) => {
-                if (entityPerCVECount < 3) {
-                    if (entity.type !== "NUMBER") {
-                        entityPerCVECount++;
-                        // totalEntitiesCount++;
-                        if (keywordMap.hasOwnProperty(entity.name)) {
-                            keywordMap[entity.name]["severity"].push(cve_interface.cvss);
-                            keywordMap[entity.name]["cves"][cve_interface.id] = {
-                                "Published": cve_interface.Published,
-                                "severity": cve_interface.cvss
-                            }
-                            keywordMap[entity.name]["count"]++;
-                        } else {
-                            keywordMap[entity.name] = {
-                                "count": 1,
-                                "severity": [cve_interface.cvss],
-                                "cves": {
-                                    [cve_interface.id] : {
-                                        "Published": cve_interface.Published,
-                                        "severity": cve_interface.cvss
-                                    }
-                                }
-                            };
+        // console.log(data[0]);
+        // totalCVEs++;
+        let entityPerCVECount = 0;
+        // For each entity in the cve data
+        return cve_interface.entities.forEach((entity, index) => {
+            if (entityPerCVECount < 3) {
+                if (entity.type !== "NUMBER") {
+                    entityPerCVECount++;
+                    // totalEntitiesCount++;
+                    if (keywordMap.hasOwnProperty(entity.name)) {
+                        keywordMap[entity.name]["severity"].push(cve_interface.cvss);
+                        keywordMap[entity.name]["cves"][cve_interface.id] = {
+                            "Published": cve_interface.Published,
+                            "severity": cve_interface.cvss
                         }
-                        // console.debug(`${entity.name} - Type: ${entity.type}, Salience: ${entity.salience}`);
+                        keywordMap[entity.name]["count"]++;
+                    } else {
+                        keywordMap[entity.name] = {
+                            "count": 1,
+                            "severity": [cve_interface.cvss],
+                            "cves": {
+                                [cve_interface.id] : {
+                                    "Published": cve_interface.Published,
+                                    "severity": cve_interface.cvss
+                                }
+                            }
+                        };
                     }
+                    // console.debug(`${entity.name} - Type: ${entity.type}, Salience: ${entity.salience}`);
                 }
-            });
+            }
+        });
         // console.debug(`total CVEs for time period: ${totalCVEs}`);
         // console.debug(`total keywords for time period: ${totalEntitiesCount}`);
     })

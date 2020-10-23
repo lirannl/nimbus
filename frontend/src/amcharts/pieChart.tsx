@@ -30,7 +30,7 @@ function getScoreRating(severity: number) {
     if (severity > 0.0 && severity <= 3.9) return "Low";
     else if (severity >= 4.0 && severity <= 6.9) return "Medium";
     else if (severity >= 7.0 && severity <= 8.9) return "High";
-    else return "High";
+    else return "Critical";
 }
 
 /**

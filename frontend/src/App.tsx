@@ -78,14 +78,13 @@ function Home(props: { data: [nimbus_interface, React.Dispatch<React.SetStateAct
     dataSetter(nimbusStore);
   }
   // localStorage.clear();
-  let content = <div id="mainContent">
+  let content = <div id="mainContent"  style={{backgroundColor: "#272645", color: "white"}}><br />
           {<form id="form" onSubmit={event => buttonResponder(event, setData, data)}>
             <div className="formItem">from:<input type="date" /></div>
             <div className="formItem">to:<input type="date" /></div>
             <div className="formItem" id="submitBtn"><input type="submit"  /></div>
           </form>}
-          {loading.value ? <div className="spinner-border text-dark"></div> : <div id="wordCloud"></div>}
-          
+          {loading.value ? <div className="spinner-border text-dark"></div> : <div id="wordCloud" style={{height: "70vh"}}></div>}
         </div>
   return content;
 }
@@ -104,22 +103,28 @@ function Keyword({ match }: RouteComponentProps<{query: string}>) {
     buildLineChart(nimbusStore.processedData[match.params.query]);
     buildPieChart(nimbusStore.processedData[match.params.query])
     let content = 
-      <div>
-        <h1>Keyword: {match.params.query}</h1>
-        <div>
-          <div>
+      <div style={{backgroundColor: "#272645", color: "white"}}>
+        <div className="container-fluid">
+          <h1>Keyword: {match.params.query}</h1>
+          <div className="col"></div>
+          <div style={{backgroundColor: "#30304D",borderRadius: "6px"}}>
             <div id="lineGraph" style={{width: "100%", height: "50vh"}}></div>
           </div>
-          <div id="row2-charts">            
-            <div id="row2-1">
-              <p>chart 2: pie</p>
-              <div id="pieChart"></div>
-            </div>
-            <div id="row2-2">
-              Top CVEs for {match.params.query}
-              <div id="scrollable"> {cveList} </div>
-            </div>
+          <div className="col"></div>
+          <br />
+          <div className="row">
+          <div className="col"></div>
+          <div className="col-5" id="left" style={{borderRadius: "6px", backgroundColor: "#30304D"}}>
+            <p><b>Severity Ratio</b></p>
+            <div id="pieChart"></div>
           </div>
+          <div className="col"></div>
+          <div className="col-5" id="right" style={{borderRadius: "6px",backgroundColor: "#30304D", overflow: "scroll", height: "100%"}}>
+            <b>Top CVEs for {match.params.query}</b>
+            <div id="scrollable"> {cveList} </div>
+          </div>
+          <div className="col"></div>
+          </div><br /> <br />
         </div>
       </div>;
     return content;
