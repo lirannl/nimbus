@@ -1,53 +1,7 @@
-/* Imports */
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
-
-/* Chart code */
-// Themes begin
 am4core.useTheme(am4themes_animated);
-
-function setLineChart(correlated_dates:any) {
-    let chart = am4core.create("chartdiv2", am4charts.XYChart);
-    chart.colors.step = 2;
-    chart.data = generateChartData(correlated_dates);
-    let dateAxis = chart.xAxes.push(new am4charts.DateAxis());
-    dateAxis.renderer.minGridDistance = 50;
-    createAxisAndSeries(chart, "CVECount", "CVECount", false);
-    createAxisAndSeries(chart, "AvgSeverity", "AvgSeverity", true);
-    chart.legend = new am4charts.Legend();
-    chart.cursor = new am4charts.XYCursor();
-    // chart.fontSize = 5;
-    // chart?.svgContainer?.htmlElement?.style?.height = 300 + "px";
-    // chart?.svgContainer?.height = 300 + "px"
-}
-
-
-function createAxisAndSeries(chart:am4charts.XYChart, field:any, name:string, opposite:any) {
-    let valueAxis = chart.yAxes.push(new am4charts.ValueAxis() as any);
-    if (chart.yAxes.indexOf(valueAxis) != 0)  valueAxis.syncWithAxis = chart.yAxes.getIndex(0);
-    let series = chart.series.push(new am4charts.LineSeries());
-    series.dataFields.valueY = field;
-    series.dataFields.dateX = "date";
-    series.strokeWidth = 2;
-    series.yAxis = valueAxis;
-    series.name = name;
-    series.tooltipText = "{name}: [bold]{valueY}[/]";
-    series.tensionX = 0.8;
-    series.showOnInit = true;
-
-    let interfaceColors = new am4core.InterfaceColorSet();
-    let bullet = series.bullets.push(new am4charts.CircleBullet());
-    bullet.circle.stroke = interfaceColors.getFor("background");
-    bullet.circle.strokeWidth = 2;
-
-    valueAxis.renderer.line.strokeOpacity = 1;
-    valueAxis.renderer.line.strokeWidth = 2;
-    valueAxis.renderer.line.stroke = series.stroke;
-    valueAxis.renderer.labels.template.fill = series.stroke;
-    valueAxis.renderer.opposite = opposite;
-}
-
 
 export interface date_correlation {
     [date: string]: {
@@ -56,40 +10,94 @@ export interface date_correlation {
     }
 }
 
-function correlate_dates(keywordData:any) {
-    let d: date_correlation = { };
+/**
+ * Add a new series of data to the chart instance
+ * @param chart chart to add series to
+ * @param field element within chart to add
+ * @param name name to call the series
+ * @param opposite 
+ */
+function addSeries(chart: am4charts.XYChart, field: string, name: string, opposite: boolean) {
+    let valueAxis = chart.yAxes.push(new am4charts.ValueAxis() as any);
+    if (chart.yAxes.indexOf(valueAxis) != 0)  valueAxis.syncWithAxis = chart.yAxes.getIndex(0);
+    let series = chart.series.push(new am4charts.LineSeries());
+    series.dataFields.valueY = field;
+    series.dataFields.dateX = "date";
+    series.strokeWidth = 2;
+    // series.yAxis = valueAxis; // this adds another Y axis - looks weird
+    series.name = name;
+    series.tooltipText = "{name}: [bold]{valueY}[/]";
+    series.tensionX = 1;
+    series.tensionY = 1;
+    series.showOnInit = true;
+    let interfaceColors = new am4core.InterfaceColorSet();
+    let bullet = series.bullets.push(new am4charts.CircleBullet());
+    bullet.circle.stroke = interfaceColors.getFor("background");
+    bullet.circle.strokeWidth = 2;
+    valueAxis.renderer.line.strokeOpacity = 1;
+    valueAxis.renderer.line.strokeWidth = 2;
+    valueAxis.renderer.line.stroke = series.stroke;
+    valueAxis.renderer.labels.template.fill = series.stroke;
+    valueAxis.renderer.opposite = opposite; 
+    series.xAxis.renderer.labels.template.wrap = true;
+    series.xAxis.renderer.labels.template.maxWidth = 80;
+    series.xAxis.renderer.labels.template.fontSize = 10;
+}  
+
+/**
+ * Associate CVE data with specific dates
+ * @param keywordData original processed data for the given keyword
+ */
+function correlateDates(keywordData:any) {
+    let data: date_correlation = { };
     Object.keys(keywordData.cves).map((cve:string, index) => {
-        if (d.hasOwnProperty(keywordData.cves[cve].Published)) {
-            d[keywordData.cves[cve].Published]["AvgSeverity"].push(keywordData.cves[cve].severity);
-            d[keywordData.cves[cve].Published]["CVECount"]++;
+        if (data.hasOwnProperty(keywordData.cves[cve].Published)) {
+            // date is already in object
+            data[keywordData.cves[cve].Published]["AvgSeverity"].push(keywordData.cves[cve].severity);
+            data[keywordData.cves[cve].Published]["CVECount"]++;
         } else {
-            d[keywordData.cves[cve].Published] = {
+            // date is not in object yet, so initialise it
+            data[keywordData.cves[cve].Published] = {
                 "CVECount": 1,
                 "AvgSeverity": [keywordData.cves[cve].severity],
             };
         }
     });
-    return d
+    return data
 }
 
-function generateChartData(correlated_dates:date_correlation) {
-    let chartData:any = [];
-    Object.keys(correlated_dates).map((day,index) => {
-        let newDate = new Date(day);
-        newDate.setHours(0, 0, 0, 0);
-        console.log(newDate)
+/**
+ * Process correlated date data to amchart's format
+ * @param correlated_dates Object of dates with CVE data
+ */
+function generateChartData(correlated_dates: date_correlation) {
+    return Object.keys(correlated_dates).map((day,index) => {
+        let publishDate = new Date(day);
+        publishDate.setHours(0, 0, 0, 0);
         const sum = correlated_dates[day].AvgSeverity.reduce((a, b) => a + b, 0);
         const avg = (sum / correlated_dates[day].AvgSeverity.length) || 0;
-        chartData.push({
-            date: newDate,
+        return {
+            date: publishDate,
             CVECount: correlated_dates[day].CVECount,
             AvgSeverity: avg 
-        });
+        };
     })
-    return chartData;
 }
 
-export function makeLineChart(keywordData:any) {
-    console.log(keywordData);
-    setLineChart(correlate_dates(keywordData))
+/**
+ * Build the line chart
+ * @param correlated_dates Object of dates with CVE data
+ */
+export function buildLineChart(keywordData:any) {
+    console.debug(keywordData);
+    let chart = am4core.create("lineGraph", am4charts.XYChart);
+    chart.colors.step = 2;
+    chart.data = generateChartData(correlateDates(keywordData));
+    let dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+    dateAxis.renderer.minGridDistance = 50;
+    addSeries(chart, "CVECount", "CVECount", false);
+    addSeries(chart, "AvgSeverity", "AvgSeverity", true);
+    chart.legend = new am4charts.Legend();
+    chart.cursor = new am4charts.XYCursor();
+    // chart.fontSize = 5;
 }

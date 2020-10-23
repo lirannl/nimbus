@@ -3,11 +3,23 @@ import * as am4core from "@amcharts/amcharts4/core";
 import * as am4plugins_wordCloud from "@amcharts/amcharts4/plugins/wordCloud"; 
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 import { Cve } from '../interfaces/cve_interface';
-
 am4core.useTheme(am4themes_animated);
 
+export interface keywordMap {
+    [keyword: string]: {
+       count: number,
+       severity: number[],
+       cves: {
+            [cveTag: string]: {
+                Published: Date;
+                severity: number;
+            }
+        }
+    }
+}
+
 function setWordCloud() {
-    const wordCloud = am4core.create("chartdiv", am4plugins_wordCloud.WordCloud);
+    const wordCloud = am4core.create("wordCloud", am4plugins_wordCloud.WordCloud);
     wordCloud.fontFamily = "Courier New";
     const keywordSeries = wordCloud.series.push(new am4plugins_wordCloud.WordCloudSeries() as any);
     keywordSeries.minFontSize = "50%";
@@ -38,19 +50,6 @@ function setWordCloud() {
     return keywordSeries;
 }
 
-
-export interface keywordMap {
-    [keyword: string]: {
-       count: number,
-       severity: number[],
-       cves: {
-            [cveTag: string]: {
-                Published: Date;
-                severity: number;
-            }
-        }
-    }
-}
 /**
  * Count & map entities to a dictionary 
  * @param data Original data from API
@@ -124,7 +123,7 @@ function sortKeywords(keywordMap: keywordMap) {
  * @param data The CVE data to build the world cloud from
  * @returns 100 keywords in am4plugins_wordCloud.WordCloud form
  */
-export function makeChart(data: Cve[]): keywordMap  {
+export function buildWordCloud(data: Cve[]): keywordMap  {
     let keywordSeries = setWordCloud();
     let words: {cveTag: string, avgSeverity: number}[] = [];
     let keywordMap = getCommonWords(data);

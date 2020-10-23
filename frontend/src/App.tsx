@@ -4,8 +4,9 @@ import {
   Switch, Route, Link, RouteComponentProps } from "react-router-dom";
 import { createCveList } from "./amcharts/cveScroll";
 import './App.css';
-import { makeChart } from './amcharts/wordCloud';
-import { makeLineChart } from './amcharts/lineChart';
+import { buildWordCloud } from './amcharts/wordCloud';
+import { buildLineChart } from './amcharts/lineChart';
+import { buildPieChart } from './amcharts/pieChart';
 import { Cve, nimbus_interface } from './interfaces/cve_interface';
 
 const API = process.env.REACT_APP_API || "/api";
@@ -26,7 +27,7 @@ const buttonResponder = async (event: React.FormEvent<HTMLFormElement>,
     }, headers)
   });
   const raw_data = (await res.json()) as Cve[];
-  let processed_data = makeChart(raw_data);
+  let processed_data = buildWordCloud(raw_data);
   const nimbusStore: nimbus_interface = {
     rawData: raw_data,
     processedData: processed_data };
@@ -73,7 +74,7 @@ function Home(props: { data: [nimbus_interface, React.Dispatch<React.SetStateAct
             <div className="formItem">to:<input type="date" /></div>
             <div className="formItem" id="submitBtn"><input type="submit"  /></div>
           </form>}
-          <div id="chartdiv"></div>
+          <div id="wordCloud"></div>
         </div>
   return content;
 }
@@ -84,30 +85,36 @@ function Keyword({ match }: RouteComponentProps<{query: string}>) {
   console.log(`query is ${match.params.query}`);
   // TODO if time: get props working instead of localStorage
   // const [data] = props.data;
-  // TODO graphs
   try {
     const nimbusStore: nimbus_interface = JSON.parse(localStorage.getItem('nimbusData')!);
-    console.log("is not empty");
     console.log(nimbusStore);
     console.log(`test: ${nimbusStore.rawData[0]}`);
     const cveList = createCveList(nimbusStore, match.params.query);
-    makeLineChart(nimbusStore.processedData[match.params.query]);
+    buildLineChart(nimbusStore.processedData[match.params.query]);
+    buildPieChart(nimbusStore.processedData[match.params.query])
     let content = 
       <div>
         <h1>Keyword: {match.params.query}</h1>
         <div>
           <div>
-            <div id="chartdiv2" style={{width: "100%", height: "50vh"}}></div>
+            <div id="lineGraph" style={{width: "100%", height: "50vh"}}></div>
           </div>
-          <div>            
-            <p>chart 2: pie</p>
-            <div>{cveList}</div>
+          <div id="row2-charts">            
+            <div id="row2-1">
+              <p>chart 2: pie</p>
+              <div id="pieChart"></div>
+            </div>
+            <div id="row2-2">
+              Top CVEs for {match.params.query}
+              <div id="scrollable"> {cveList} </div>
+            </div>
           </div>
         </div>
       </div>;
     return content;
   } catch(e) {
     console.log(e);
+    // TODO redirect to homepage instead
     return <div><h1>The keyword {match.params.query} is not indexed</h1>
       <p>Please reload home and select a keyword from the processed data</p></div>;
   }
