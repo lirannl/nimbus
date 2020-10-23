@@ -13,10 +13,11 @@ export interface score_correlation {
  */
 function correlateSeverity(keywordData: any) {
     let data: score_correlation = { };
-    Object.keys(keywordData.cves).map((cve:string, index) => {
+    Object.keys(keywordData.cves).map((cve: string, index) => {
         const severityRating = getScoreRating(keywordData.cves[cve].severity);
         if (data.hasOwnProperty(severityRating)) data[severityRating]++;
         else data[severityRating] = 1;
+        return cve;
     });
     return data;
 }

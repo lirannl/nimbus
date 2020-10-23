@@ -19,7 +19,7 @@ export interface date_correlation {
  */
 function addSeries(chart: am4charts.XYChart, field: string, name: string, opposite: boolean) {
     let valueAxis = chart.yAxes.push(new am4charts.ValueAxis() as any);
-    if (chart.yAxes.indexOf(valueAxis) != 0)  valueAxis.syncWithAxis = chart.yAxes.getIndex(0);
+    if (chart.yAxes.indexOf(valueAxis) !== 0)  valueAxis.syncWithAxis = chart.yAxes.getIndex(0);
     let series = chart.series.push(new am4charts.LineSeries());
     series.dataFields.valueY = field;
     series.dataFields.dateX = "date";
@@ -48,9 +48,9 @@ function addSeries(chart: am4charts.XYChart, field: string, name: string, opposi
  * Associate CVE data with specific dates
  * @param keywordData original processed data for the given keyword
  */
-function correlateDates(keywordData:any) {
+function correlateDates(keywordData: any) {
     let data: date_correlation = { };
-    Object.keys(keywordData.cves).map((cve:string, index) => {
+    Object.keys(keywordData.cves).map((cve: string, index) => {
         if (data.hasOwnProperty(keywordData.cves[cve].Published)) {
             // date is already in object
             data[keywordData.cves[cve].Published]["AvgSeverity"].push(keywordData.cves[cve].severity);
@@ -62,6 +62,7 @@ function correlateDates(keywordData:any) {
                 "AvgSeverity": [keywordData.cves[cve].severity],
             };
         }
+        return cve;
     });
     return data
 }

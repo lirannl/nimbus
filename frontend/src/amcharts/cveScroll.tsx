@@ -6,7 +6,6 @@ import { nimbus_interface } from '../interfaces/cve_interface';
  * @param severity CVSS score (between 0 and 10)
  */
 function buildSeverityBtn(severity: number) {
-    let severityBtn = ``;
     if (severity > 0.0 && severity <= 3.9) {
         return <span className="badge badge-success">{severity} Low</span>
     } else if (severity >= 4.0 && severity <= 6.9) {

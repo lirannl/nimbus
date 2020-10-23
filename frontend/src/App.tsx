@@ -10,33 +10,23 @@ import { buildPieChart } from './amcharts/pieChart';
 import { Cve, nimbus_interface } from './interfaces/cve_interface';
 
 const API = process.env.REACT_APP_API || "/api";
-
-const buttonResponder = async (event: React.FormEvent<HTMLFormElement>, 
-  dataSetter: React.Dispatch<React.SetStateAction<nimbus_interface>>,
-  test: nimbus_interface) => {
-  event.preventDefault();
-  const formElements = event.target as unknown as HTMLInputElement[];
-  const headers = { startdate: formElements[0].value, enddate: formElements[1].value };
-  console.log("Loading...");
-  const res = await fetch(API, {
-    referrerPolicy: "origin-when-cross-origin",
-    method: "GET",
-    headers: Object.assign({
-      "Content-Type": "application/json",
-      Accept: "application/json"
-    }, headers)
-  });
-  const raw_data = (await res.json()) as Cve[];
-  let processed_data = buildWordCloud(raw_data);
-  const nimbusStore: nimbus_interface = {
-    rawData: raw_data,
-    processedData: processed_data };
-  localStorage.setItem('nimbusData', JSON.stringify(nimbusStore));
-  dataSetter(nimbusStore);
-}
+const MakeStateful = (init: any) => {
+  const [state, setState] = React.useState(init);
+  return {
+    getter: () => state,
+    setter: setState,
+    get value() {
+      return state;
+    },
+    set value(newVal) {
+      setState(newVal);
+    },
+  };
+};
 
 function App() {
   const [data, setData] = React.useState({} as nimbus_interface );
+  
   return (
     <Router>
       <div>
@@ -48,12 +38,6 @@ function App() {
             </nav>
             <Switch>
               <Route exact path="/"><Home data={[data, setData]}/></Route>
-              {/* <Route path="/keyword/:query"><Keyword path /></Route> */}
-              {/* <Route path="/keyword/:query" pageComponent={(props: RouteComponentProps<{ query: string }>) => (
-                <Keyword query={props.query} />)}></Route> */}
-              {/* <Route path="/keyword/:query"><Keyword data={[data, setData]}/></Route> */}
-
-              {/* <Route path="/" exact component={Home} /> */}
               <Route path="/keyword/:query"  component={Keyword} />
             </Switch>
             <div id="footer"><p>&copy; 2020 <b>NIMBUS</b></p></div>
@@ -67,14 +51,41 @@ function App() {
 
 function Home(props: { data: [nimbus_interface, React.Dispatch<React.SetStateAction<nimbus_interface>>] }) {
   const [data, setData] = props.data;
-  console.log("grabbing home");
+  const loading = MakeStateful(false);
+  const buttonResponder = async (event: React.FormEvent<HTMLFormElement>, 
+    dataSetter: React.Dispatch<React.SetStateAction<nimbus_interface>>,
+    test: nimbus_interface) => {
+    event.preventDefault();
+    const formElements = event.target as unknown as HTMLInputElement[];
+    const headers = { startdate: formElements[0].value, enddate: formElements[1].value };
+    console.log("Loading...");
+    loading.value = true;
+    const res = await fetch(API, {
+      referrerPolicy: "origin-when-cross-origin",
+      method: "GET",
+      headers: Object.assign({
+        "Content-Type": "application/json",
+        Accept: "application/json"
+      }, headers)
+    });
+    const raw_data = (await res.json()) as Cve[];
+    loading.value = false;
+    let processed_data = buildWordCloud(raw_data);
+    const nimbusStore: nimbus_interface = {
+      rawData: raw_data,
+      processedData: processed_data };
+    localStorage.setItem('nimbusData', JSON.stringify(nimbusStore));
+    dataSetter(nimbusStore);
+  }
+  // localStorage.clear();
   let content = <div id="mainContent">
           {<form id="form" onSubmit={event => buttonResponder(event, setData, data)}>
             <div className="formItem">from:<input type="date" /></div>
             <div className="formItem">to:<input type="date" /></div>
             <div className="formItem" id="submitBtn"><input type="submit"  /></div>
           </form>}
-          <div id="wordCloud"></div>
+          {loading.value ? <div className="spinner-border text-dark"></div> : <div id="wordCloud"></div>}
+          
         </div>
   return content;
 }

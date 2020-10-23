@@ -57,23 +57,19 @@ function setWordCloud() {
  */
 function getCommonWords(data: Cve[]) {
     let keywordMap: keywordMap = {};
-    let totalCVEs = 0;
-    let totalEntitiesCount = 0;
+    // let totalCVEs = 0;
+    // let totalEntitiesCount = 0;
     console.log(`data: ${data}`);
-    data.map( //day => {
-        // console.debug(`Number of CVEs for ${day[0]}: ${day[1].length}`);
-        // For each CVE of current day, get top 3 salient entities
-        //day[1].map(
-        (cve_interface, index) => {
+    data.map((cve_interface, index) => {
             console.log(data[0]);
-            totalCVEs++;
+            // totalCVEs++;
             let entityPerCVECount = 0;
             // For each entity in the cve data
             return cve_interface.entities.forEach((entity, index) => {
                 if (entityPerCVECount < 3) {
                     if (entity.type !== "NUMBER") {
                         entityPerCVECount++;
-                        totalEntitiesCount++;
+                        // totalEntitiesCount++;
                         if (keywordMap.hasOwnProperty(entity.name)) {
                             keywordMap[entity.name]["severity"].push(cve_interface.cvss);
                             keywordMap[entity.name]["cves"][cve_interface.id] = {
@@ -97,11 +93,10 @@ function getCommonWords(data: Cve[]) {
                     }
                 }
             });
-        // })
-        console.debug(`total CVEs for time period: ${totalCVEs}`);
+        // console.debug(`total CVEs for time period: ${totalCVEs}`);
         // console.debug(`total keywords for time period: ${totalEntitiesCount}`);
     })
-    console.debug(`Total non duplicate keywords for time period: ${Object.keys(keywordMap).length}`);
+    // console.debug(`Total non duplicate keywords for time period: ${Object.keys(keywordMap).length}`);
     return keywordMap;
 }
 
