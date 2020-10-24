@@ -70,7 +70,7 @@ function getCommonWords(data: Cve[]) {
                 if (entity.type !== "NUMBER") {
                     entityPerCVECount++;
                     // totalEntitiesCount++;
-                    if (keywordMap.hasOwnProperty(entity.name)) {
+                    if (keywordMap[entity.name]) {
                         keywordMap[entity.name]["severity"].push(cve_interface.cvss);
                         keywordMap[entity.name]["cves"][cve_interface.id] = {
                             "Published": cve_interface.Published,

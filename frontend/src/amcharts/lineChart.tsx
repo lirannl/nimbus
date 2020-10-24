@@ -51,20 +51,22 @@ function addSeries(chart: am4charts.XYChart, field: string, name: string, opposi
 function correlateDates(keywordData: any) {
     let data: date_correlation = { };
     Object.keys(keywordData.cves).map((cve: string, index) => {
-        if (data.hasOwnProperty(keywordData.cves[cve].Published)) {
+        const dateFix = new Date(keywordData.cves[cve].Published)
+        dateFix.setHours(0, 0, 0, 0);
+        if (data[dateFix.toDateString()]) {
             // date is already in object
-            data[keywordData.cves[cve].Published]["AvgSeverity"].push(keywordData.cves[cve].severity);
-            data[keywordData.cves[cve].Published]["CVECount"]++;
+            data[dateFix.toDateString()]["AvgSeverity"].push(keywordData.cves[cve].severity);
+            data[dateFix.toDateString()]["CVECount"]++;
         } else {
             // date is not in object yet, so initialise it
-            data[keywordData.cves[cve].Published] = {
+            data[dateFix.toDateString()] = {
                 "CVECount": 1,
                 "AvgSeverity": [keywordData.cves[cve].severity],
             };
         }
         return cve;
     });
-    return data
+    return data;
 }
 
 /**
@@ -74,6 +76,7 @@ function correlateDates(keywordData: any) {
 function generateChartData(correlated_dates: date_correlation) {
     return Object.keys(correlated_dates).map((day,index) => {
         let publishDate = new Date(day);
+        publishDate = new Date(publishDate.toDateString())
         publishDate.setHours(0, 0, 0, 0);
         const sum = correlated_dates[day].AvgSeverity.reduce((a, b) => a + b, 0);
         const avg = (sum / correlated_dates[day].AvgSeverity.length) || 0;
@@ -94,6 +97,8 @@ export function buildLineChart(keywordData:any) {
     let chart = am4core.create("lineGraph", am4charts.XYChart);
     chart.colors.step = 2;
     chart.data = generateChartData(correlateDates(keywordData));
+    console.log(correlateDates(keywordData));
+    console.log(chart.data);
     let dateAxis = chart.xAxes.push(new am4charts.DateAxis());
     dateAxis.renderer.minGridDistance = 50;
     addSeries(chart, "CVECount", "CVECount", false);

@@ -41,7 +41,7 @@ export interface Impact {
 }
 
 export interface nimbus_interface {
-    rawData: Cve[];
+    // rawData: Cve[];
     processedData: {
         [keyword: string]: {
             count: number;

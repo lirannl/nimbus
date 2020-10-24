@@ -72,7 +72,7 @@ function Home(props: { data: [nimbus_interface, React.Dispatch<React.SetStateAct
     loading.value = false;
     let processed_data = buildWordCloud(raw_data);
     const nimbusStore: nimbus_interface = {
-      rawData: raw_data,
+      // rawData: raw_data,
       processedData: processed_data };
     localStorage.setItem('nimbusData', JSON.stringify(nimbusStore));
     dataSetter(nimbusStore);
@@ -98,7 +98,7 @@ function Keyword({ match }: RouteComponentProps<{query: string}>) {
   try {
     const nimbusStore: nimbus_interface = JSON.parse(localStorage.getItem('nimbusData')!);
     console.log(nimbusStore);
-    console.log(`test: ${nimbusStore.rawData[0]}`);
+    // console.log(`test: ${nimbusStore.rawData[0]}`);
     const cveList = createCveList(nimbusStore, match.params.query);
     buildLineChart(nimbusStore.processedData[match.params.query]);
     buildPieChart(nimbusStore.processedData[match.params.query])
