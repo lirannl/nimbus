@@ -160,6 +160,7 @@ const popUp = <div className="container"><div className="modal" id="helpModal">
         <ul>
           <li>Google Cloud API allows up to 600 requests every 1 min window. Should this rate limit be hit, Nimbus will wait 1 min before re-attempting.</li>
           <li>CVSS scores are typically 5.0 until NVD/NIST completes their analysis, usually within 1-2 weeks of publishing.</li>
+          <li>There is CVE data available from CIRCL, from 1999 onwards.</li>
         </ul>
       </div>
       <div className="modal-footer">
