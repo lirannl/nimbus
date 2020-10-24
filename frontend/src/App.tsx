@@ -39,6 +39,7 @@ function App() {
               <Route exact path="/"><Home data={[data, setData]}/></Route>
               <Route path="/keyword/:query"  component={Keyword} />
               <Route component={NotFound} />
+              <Route><p>this is not good</p></Route>
             </Switch>
             <div id="footer"><p>&copy; 2020 <b>NIMBUS</b></p></div>
           </header>
