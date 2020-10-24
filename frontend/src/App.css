@@ -38,6 +38,11 @@ body {
   color: #61dafb;
 }
 
+#nav-logo {
+  width:27px;
+  margin-right:8px;
+  margin-bottom:3px;
+}
 .navBar {
   width: 100%;
   align-items:left;
@@ -71,6 +76,10 @@ body {
   height: 70%;
 }
 
+#pieChart {
+  height: 70% !important;
+}
+
 /* #row2-charts {
   display: flex;
 }
@@ -82,23 +91,35 @@ body {
 #row2-2 {
   outline: 2px solid black;
 } */
-
-.row {
-  height: 30vh;
+.test {
+  margin: 0 4%;
 }
 
-/* #scrollable {
-  height: 35vh;
+.row {
+  height: 50vh;
+}
+
+.pieChart {
+  height: 50% !important;
+  background-color: red !important;
+}
+
+#scrollable {
   overflow: scroll;
-  margin: 0 20px;
-} */
+  height: 88%;
+  scrollbar-width: thin;
+  scrollbar-color: #1d1d2e #30304D;
+  /* height: 35vh;
+  overflow: scroll;
+  margin: 0 20px; */
+}
 
 #footer {
   font-size: 20px;
   padding-top: 15px; 
   width: 100%; 
-  background-color: grey; 
-  color: black; 
+  background-color:  #272645; 
+  color: white; 
   text-align: center;
 }
 

@@ -27,6 +27,7 @@ function addSeries(chart: am4charts.XYChart, field: string, name: string, opposi
     // series.yAxis = valueAxis; // this adds another Y axis - looks weird
     series.name = name;
     series.tooltipText = "{name}: [bold]{valueY}[/]";
+    // series.tooltipText.fontcolor("white");
     series.tensionX = 1;
     series.tensionY = 1;
     series.showOnInit = true;
@@ -42,6 +43,7 @@ function addSeries(chart: am4charts.XYChart, field: string, name: string, opposi
     series.xAxis.renderer.labels.template.wrap = true;
     series.xAxis.renderer.labels.template.maxWidth = 80;
     series.xAxis.renderer.labels.template.fontSize = 10;
+    series.xAxis.renderer.labels.template.fill = am4core.color("white");
 }  
 
 /**
@@ -93,17 +95,17 @@ function generateChartData(correlated_dates: date_correlation) {
  * @param correlated_dates Object of dates with CVE data
  */
 export function buildLineChart(keywordData:any) {
-    console.debug(keywordData);
+    // console.debug(keywordData);
     let chart = am4core.create("lineGraph", am4charts.XYChart);
     chart.colors.step = 2;
     chart.data = generateChartData(correlateDates(keywordData));
-    console.log(correlateDates(keywordData));
-    console.log(chart.data);
     let dateAxis = chart.xAxes.push(new am4charts.DateAxis());
     dateAxis.renderer.minGridDistance = 50;
     addSeries(chart, "CVECount", "CVECount", false);
     addSeries(chart, "AvgSeverity", "AvgSeverity", true);
     chart.legend = new am4charts.Legend();
+    chart.legend.labels.template.fill = am4core.color("white");
+
     chart.cursor = new am4charts.XYCursor();
     // chart.fontSize = 5;
 }

@@ -54,6 +54,16 @@ function generateChartData(keywordData: any) {
 export function buildPieChart(keywordData: any) {
     let chart = am4core.create("pieChart", am4charts.PieChart);
     chart.data = generateChartData(keywordData);
+    chart.hiddenState.properties.radius = am4core.percent(0);
+    chart.innerRadius = am4core.percent(30);
+    chart.legend = new am4charts.Legend();
+    chart.legend.labels.template.fill = am4core.color("white");
+    chart.legend.valueLabels.template.text = "{category.value}";
+    // chart.legend.valueLabels.template.fontFamily =  "Courier New";
+    chart.legend.valueLabels.template.width = 10;
+    chart.legend.maxWidth = undefined!;
+    chart.legend.fontSize = 20;
+
     let pieSeries = chart.series.push(new am4charts.PieSeries());
     pieSeries.dataFields.value = "numberOfCVEs";
     pieSeries.dataFields.category = "severity";
@@ -62,5 +72,13 @@ export function buildPieChart(keywordData: any) {
     pieSeries.hiddenState.properties.opacity = 1;
     pieSeries.hiddenState.properties.endAngle = -90;
     pieSeries.hiddenState.properties.startAngle = -90;
-    chart.hiddenState.properties.radius = am4core.percent(0);
+
+    pieSeries.alignLabels = false;
+    pieSeries.labels.template.radius = am4core.percent(-40);
+    pieSeries.labels.template.fill = am4core.color("white");
+    pieSeries.labels.template.text = "{value.percent.formatNumber('#.0')}%";
+    // pieSeries.labels.template.padding(0,0,0,0);
+
+    pieSeries.ticks.template.disabled = true;
+    pieSeries!.tooltip!.disabled = true;
 }
