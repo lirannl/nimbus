@@ -32,12 +32,13 @@ function App() {
         <div className="App">
           <header className="App-header">
             <nav className="navbar navbar-light bg-light navBar">
-              <Link to="/" className="navbar-brand"><img id="nav-logo" src="../nimbus-logo.png"/><b> NIMBUS</b></Link>
+              <Link to="/" className="navbar-brand"><img id="nav-logo" src="../nimbus-logo.png" alt="Nimbus logo"/><b> NIMBUS</b></Link>
               <button type="button" data-toggle="modal" data-target="#helpModal" className="btn btn-light my-2 my-sm-0" id="modalBtn">&nbsp;<b>?</b>&nbsp;</button>
             </nav> {popUp}
             <Switch>
               <Route exact path="/"><Home data={[data, setData]}/></Route>
               <Route path="/keyword/:query"  component={Keyword} />
+              <Route component={NotFound} />
             </Switch>
             <div id="footer"><p>&copy; 2020 <b>NIMBUS</b></p></div>
           </header>
@@ -46,6 +47,8 @@ function App() {
     </Router>
   );
 }
+
+export default App;
 
 function Home(props: { data: [nimbus_interface, React.Dispatch<React.SetStateAction<nimbus_interface>>] }) {
   const [data, setData] = props.data;
@@ -56,6 +59,13 @@ function Home(props: { data: [nimbus_interface, React.Dispatch<React.SetStateAct
     event.preventDefault();
     const formElements = event.target as unknown as HTMLInputElement[];
     const headers = { startdate: formElements[0].value, enddate: formElements[1].value };
+    if (headers.startdate < "1999" || headers.enddate > "2021") {
+      return document.getElementById('form-error')!.textContent = "Please ensure your dates are between 1999 and 2020";
+    } 
+    if (headers.startdate > headers.enddate) {
+      return document.getElementById('form-error')!.textContent = "Please ensure your end date is before your start date";
+    }
+    document.getElementById('form-error')!.textContent = "";
     console.log("Loading...");
     loading.value = true;
     const res = await fetch(API, {
@@ -69,31 +79,27 @@ function Home(props: { data: [nimbus_interface, React.Dispatch<React.SetStateAct
     const raw_data = (await res.json()) as Cve[];
     loading.value = false;
     let processed_data = buildWordCloud(raw_data);
-    const nimbusStore: nimbus_interface = {
-      processedData: processed_data };
+    const nimbusStore: nimbus_interface = { processedData: processed_data };
     localStorage.setItem('nimbusData', JSON.stringify(nimbusStore));
     dataSetter(nimbusStore);
   }
   // localStorage.clear();
   return <div id="mainHomeContent"><br />
-          {<form id="form" onSubmit={event => buttonResponder(event, setData, data)}>
-            <div className="formItem">from:<input type="date" /></div>
-            <div className="formItem">to:<input type="date" /></div>
-            <div className="formItem" id="submitBtn"><input type="submit"  /></div>
-          </form>}
-          {loading.value ? <div className="spinner-border text-light"></div> : <div id="wordCloud" style={{height: "65vh"}}></div>}
-        </div>
+    {<form id="form" onSubmit={event => buttonResponder(event, setData, data)}>
+      <div className="formItem">from:<input type="date" /></div>
+      <div className="formItem">to:<input type="date" /></div>
+      <div className="formItem" id="submitBtn"><input type="submit" /></div>
+    </form>}
+    <div id="form-error"></div>
+    {loading.value ? <div className="spinner-border text-light"></div> : <div id="wordCloud" style={{height: "65vh"}}></div>}
+  </div>
 }
 
 function Keyword({ match }: RouteComponentProps<{query: string}>) {
-  // props: { data: [nimbus_interface, React.Dispatch<React.SetStateAction<nimbus_interface>>] }) {
   console.log(`query is ${match.params.query}`);
-  // TODO if time: get props working instead of localStorage
-  // const [data] = props.data;
   try {
     const nimbusStore: nimbus_interface = JSON.parse(localStorage.getItem('nimbusData')!);
     console.log(nimbusStore);
-    // console.log(`test: ${nimbusStore.rawData[0]}`);
     const cveList = createCveList(nimbusStore, match.params.query);
     buildLineChart(nimbusStore.processedData[match.params.query]);
     buildPieChart(nimbusStore.processedData[match.params.query])
@@ -120,19 +126,28 @@ function Keyword({ match }: RouteComponentProps<{query: string}>) {
         </div>
       </div>;
   } catch(e) {
-    // console.log(e);
-    // TODO redirect to homepage instead
     return <div className="container-fluid" id="error-page">
-          <span>
-            <h1>The keyword "{match.params.query}" is not indexed</h1>
-            <p>Please reload home and select a keyword from the processed data</p>
-            <p>:'(</p>
-          </span>
-      </div>;
+      <span>
+        <h1>The keyword "{match.params.query}" is not indexed</h1>
+        <p>You will be redirected to the home page in 5 seconds.</p>
+        <script>
+          { setTimeout(function(){window.location.href = '/'; }, 5000)}
+        </script>
+        <p>:'(</p>
+      </span>
+    </div>
   }
 }
 
-export default App;
+function NotFound() {
+  return <div className="container-fluid" id="error-page">
+  <span>
+    <h1>Oh no!</h1>
+    <p>This page doesn't exist. Try <a href="/"><i className="fas fa-home"></i></a>?</p>
+    <p>:'(</p>
+  </span>
+</div>;
+}
 
 const popUp = <div className="container"><div className="modal" id="helpModal">
     <div className="modal-dialog"><div className="modal-content">

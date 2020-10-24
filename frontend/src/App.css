@@ -57,6 +57,15 @@ body {
   font-size: 20px;
 }
 
+.fa-home {
+  color: #AFB5D3;
+}
+
+#form-error {
+  color: #AFB5D3;
+  padding-top: 5px;
+}
+
 #modalBtnClose {
   background-color: #272645;
   border-color: #272645;
@@ -82,7 +91,6 @@ body {
 #form {
   display: flex;
   justify-content: center;
-
 }
 
 .formItem {
