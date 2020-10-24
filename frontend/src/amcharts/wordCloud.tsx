@@ -1,9 +1,9 @@
 import '../App.css';
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4plugins_wordCloud from "@amcharts/amcharts4/plugins/wordCloud"; 
-import am4themes_animated from "@amcharts/amcharts4/themes/animated";
+// import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 import { Cve } from '../interfaces/cve_interface';
-am4core.useTheme(am4themes_animated);
+// am4core.useTheme(am4themes_animated);
 
 export interface keywordMap {
     [keyword: string]: {
@@ -28,19 +28,23 @@ function setWordCloud() {
     keywordSeries.rotationThreshold = 0.0;
     keywordSeries.dataFields.word = "cveTag";
     keywordSeries.dataFields.value = "avgSeverity";
+    keywordSeries.dataFields.value2 = "total";
     // keywordSeries.dataFields.tag = "cweTag";
     keywordSeries.heatRules.push({
         "target": keywordSeries.labels.template,
         "property": "fill",
-        "min": am4core.color("#0000CC"),
-        "max": am4core.color("#CC00CC"),
+        // "min": am4core.color("#33CAFA"),
+        "min": am4core.color("#33CAFA"),
+        "max": am4core.color("#D456DC"),
         "dataField": "value"
     });
     keywordSeries.labels.template.url = `/keyword/{word}`;
     keywordSeries.labels.template.urlTarget = "_self";
-    keywordSeries.labels.template.tooltipText = "Avg Severity: {value}";
+    keywordSeries.labels.template.tooltipText = "Avg Severity: {value} \n Number of CVEs: {total}";
+    keywordSeries.tooltip.autoTextColor = false;
+    keywordSeries.tooltip.label.fill = am4core.color("white");
     let hoverState = keywordSeries.labels.template.states.create("hover");
-    hoverState.properties.fill = am4core.color("#FF0000");
+    hoverState.properties.fill = am4core.color("white");
     // let subtitle = chart.titles.create();
     // subtitle.text = "(click to open)";
     // let title = chart.titles.create();
@@ -120,13 +124,16 @@ function sortKeywords(keywordMap: keywordMap) {
  */
 export function buildWordCloud(data: Cve[]): keywordMap  {
     let keywordSeries = setWordCloud();
-    let words: {cveTag: string, avgSeverity: number}[] = [];
+    keywordSeries.showOnInit = false;
+    keywordSeries.hiddenState.transitionDuration = 5000;
+    let words: { cveTag: string, avgSeverity: number, total: number }[] = [];
     let keywordMap = getCommonWords(data);
     let sortedKeywords = sortKeywords(keywordMap);
     sortedKeywords.forEach(function (value) {
         words.push({
-            "cveTag": value.name, 
-            "avgSeverity": value.avgSeverity
+            cveTag: value.name, 
+            avgSeverity: value.avgSeverity,
+            total: value.total
         })
       }); 
     keywordSeries.data = words.slice(0,100);

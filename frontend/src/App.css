@@ -24,14 +24,11 @@ body {
 }
 
 .App-header {
-  /* background-color: rgb(190, 232, 176); */
-  /* min-height: 100vh; */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  /* color: rgb(190, 232, 176); */
 }
 
 .App-link {
@@ -47,12 +44,39 @@ body {
   width: 100%;
   align-items:left;
   display:flex;
-  background-color: rgb(174, 174, 174);
+  color: white !important;
+  background-color: #272645 !important;/*rgb(174, 174, 174);*/
 }
 
-#mainContent {
+.navBar a {
+   color: white !important;
+}
+
+.fa-link {
+  color:  #AFB5D3;
+  font-size: 20px;
+}
+
+#modalBtnClose {
+  background-color: #272645;
+  border-color: #272645;
+}
+
+.modal-body p, li {
+  font-size: 20px;
+  text-align: left;
+}
+
+#mainHomeContent {
   width: 100%;
   height: 100vh;
+  background-color: #272645;
+  color: white;
+}
+
+#mainKeywordContent {
+  background-color: #272645;
+  color: #AFB5D3; 
 }
 
 #form {
@@ -80,19 +104,16 @@ body {
   height: 70% !important;
 }
 
-/* #row2-charts {
-  display: flex;
-}
-
-#row2-1, #row2-2 {
-  flex:1;
-}
-
-#row2-2 {
-  outline: 2px solid black;
-} */
-.test {
+.row-1 {
   margin: 0 4%;
+  background-color: #30304D;
+  border-radius: 6px;
+}
+
+#left, #right {
+  border-radius: 6px;
+  background-color: #30304D;
+  height: 100%;
 }
 
 .row {
@@ -102,6 +123,11 @@ body {
 .pieChart {
   height: 50% !important;
   background-color: red !important;
+}
+
+#lineGraph {
+  width: 100%;
+  height: 50vh;
 }
 
 #scrollable {
@@ -114,6 +140,15 @@ body {
   margin: 0 20px; */
 }
 
+.title {
+  text-align: left;
+  padding: 5px 0;
+}
+
+.badge {
+  margin: 0 5px !important;
+}
+
 #footer {
   font-size: 20px;
   padding-top: 15px; 
@@ -121,6 +156,18 @@ body {
   background-color:  #272645; 
   color: white; 
   text-align: center;
+}
+
+#error-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  width: 100%;
+  background-color: #272645; 
+  color: #AFB5D3; 
+  width: 100%; 
+  height: 90vh;
 }
 
 #footer p {

@@ -23,8 +23,11 @@ function buildSeverityBtn(severity: number) {
  * @param keyword The keyword selected by user
  */
 export function createCveList(data: nimbus_interface, keyword: string) {
-    return <div>{Object.keys(data.processedData[keyword].cves).map((cve, index) => 
-        <div key={`${index}`}>{cve} {buildSeverityBtn(data.processedData[keyword].cves[cve].severity)}</div>)}
-        {/* <div>{cve} {data.processedData[keyword].cves[cve].severity} {data.processedData[keyword].cves[cve].Published}</div>)} */}
+    return <div>{Object.keys(data.processedData[keyword].cves).map((cve, index) => {
+        const url = `https://nvd.nist.gov/vuln/detail/${cve}`;
+        return <div key={`${index}`}>
+            {cve} {buildSeverityBtn(data.processedData[keyword].cves[cve].severity)} {<a href={cve}><i className="fas fa-link"></i></a>}
+        </div>})}
     </div>
+
 }

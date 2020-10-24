@@ -7,6 +7,13 @@ export interface score_correlation {
     [severityRating: string]: number;
 }
 
+const color_lookup: {[severity: string]: string} = {
+    "Critical": "#DB404D",
+    "High": "#F89900",
+    "Medium": "#F9CA00",
+    "Low": "#35B147"
+}
+
 /**
  * Associate CVE data with specific dates
  * @param keywordData original processed data for the given keyword
@@ -43,7 +50,8 @@ function generateChartData(keywordData: any) {
         console.log(item)
         return {
             severity: item,
-            numberOfCVEs: data[item]
+            numberOfCVEs: data[item],
+            color: color_lookup[item]
         };
     })
 }
@@ -54,10 +62,11 @@ function generateChartData(keywordData: any) {
 export function buildPieChart(keywordData: any) {
     let chart = am4core.create("pieChart", am4charts.PieChart);
     chart.data = generateChartData(keywordData);
+    console.log(chart.data)
     chart.hiddenState.properties.radius = am4core.percent(0);
     chart.innerRadius = am4core.percent(30);
     chart.legend = new am4charts.Legend();
-    chart.legend.labels.template.fill = am4core.color("white");
+    chart.legend.labels.template.fill = am4core.color("#AFB5D3");
     chart.legend.valueLabels.template.text = "{category.value}";
     // chart.legend.valueLabels.template.fontFamily =  "Courier New";
     chart.legend.valueLabels.template.width = 10;
@@ -75,9 +84,12 @@ export function buildPieChart(keywordData: any) {
 
     pieSeries.alignLabels = false;
     pieSeries.labels.template.radius = am4core.percent(-40);
-    pieSeries.labels.template.fill = am4core.color("white");
+    pieSeries.labels.template.fill = am4core.color("black");
     pieSeries.labels.template.text = "{value.percent.formatNumber('#.0')}%";
+    pieSeries.labels.template.fontSize = 15;
     // pieSeries.labels.template.padding(0,0,0,0);
+    pieSeries.slices.template.propertyFields.fill = "color";
+    pieSeries.slices.template.propertyFields.stroke = "color";
 
     pieSeries.ticks.template.disabled = true;
     pieSeries!.tooltip!.disabled = true;

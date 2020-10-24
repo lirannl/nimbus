@@ -26,15 +26,15 @@ const MakeStateful = (init: any) => {
 
 function App() {
   const [data, setData] = React.useState({} as nimbus_interface );
-  return (
+  return ( 
     <Router>
       <div>
         <div className="App">
           <header className="App-header">
-            <nav className="navbar navbar-light bg-light navBar" >
+            <nav className="navbar navbar-light bg-light navBar">
               <Link to="/" className="navbar-brand"><img id="nav-logo" src="../nimbus-logo.png"/><b> NIMBUS</b></Link>
-              <button type="button" data-toggle="modal" data-target="#myModal" className="btn btn-secondary my-2 my-sm-0" >&nbsp;<b>?</b>&nbsp;</button>
-            </nav>
+              <button type="button" data-toggle="modal" data-target="#helpModal" className="btn btn-light my-2 my-sm-0" id="modalBtn">&nbsp;<b>?</b>&nbsp;</button>
+            </nav> {popUp}
             <Switch>
               <Route exact path="/"><Home data={[data, setData]}/></Route>
               <Route path="/keyword/:query"  component={Keyword} />
@@ -75,13 +75,13 @@ function Home(props: { data: [nimbus_interface, React.Dispatch<React.SetStateAct
     dataSetter(nimbusStore);
   }
   // localStorage.clear();
-  return <div id="mainContent"  style={{backgroundColor: "#272645", color: "white"}}><br />
+  return <div id="mainHomeContent"><br />
           {<form id="form" onSubmit={event => buttonResponder(event, setData, data)}>
             <div className="formItem">from:<input type="date" /></div>
             <div className="formItem">to:<input type="date" /></div>
             <div className="formItem" id="submitBtn"><input type="submit"  /></div>
           </form>}
-          {loading.value ? <div className="spinner-border text-dark"></div> : <div id="wordCloud" style={{height: "70vh"}}></div>}
+          {loading.value ? <div className="spinner-border text-light"></div> : <div id="wordCloud" style={{height: "65vh"}}></div>}
         </div>
 }
 
@@ -97,22 +97,22 @@ function Keyword({ match }: RouteComponentProps<{query: string}>) {
     const cveList = createCveList(nimbusStore, match.params.query);
     buildLineChart(nimbusStore.processedData[match.params.query]);
     buildPieChart(nimbusStore.processedData[match.params.query])
-    return <div style={{backgroundColor: "#272645", color: "white"}}>
+    return <div id="mainKeywordContent">
         <div className="container-fluid">
           <h1>Keyword: "{match.params.query}"</h1>
-            <div className="test" style={{backgroundColor: "#30304D",borderRadius: "6px"}}>
-              <div id="lineGraph" style={{width: "100%", height: "50vh"}}></div>
+            <div className="row-1">
+              <div id="lineGraph"></div>
             </div>
             <br />
           <div className="row">
             <div className="col"></div>
-            <div className="col-5" id="left" style={{borderRadius: "6px", backgroundColor: "#30304D",height: "100%"}}>
-              <p><b>Severity Ratio</b></p>
+            <div className="col-5" id="left">
+              <h4 className="title"><b>Severity Ratio</b></h4>
               <div id="pieChart"></div>
             </div>
             <div className="col"> </div>
-            <div className="col-5" id="right" style={{borderRadius: "6px",backgroundColor: "#30304D",  height: "100%"}}>
-              <b>Top CVEs for {match.params.query}</b>
+            <div className="col-5" id="right">
+              <h4 className="title"><b>Top CVEs for {match.params.query}</b></h4>
               <div id="scrollable"> {cveList} </div>
             </div>
             <div className="col"> </div>
@@ -120,15 +120,35 @@ function Keyword({ match }: RouteComponentProps<{query: string}>) {
         </div>
       </div>;
   } catch(e) {
-    console.log(e);
+    // console.log(e);
     // TODO redirect to homepage instead
-    return <div style={{backgroundColor: "#272645", color: "white", width: "100%", height: "90vh"}}>
-        <div className="container-fluid">
-          <h1>The keyword "{match.params.query}" is not indexed</h1>
-          <p>Please reload home and select a keyword from the processed data</p>
-        </div>
+    return <div className="container-fluid" id="error-page">
+          <span>
+            <h1>The keyword "{match.params.query}" is not indexed</h1>
+            <p>Please reload home and select a keyword from the processed data</p>
+            <p>:'(</p>
+          </span>
       </div>;
   }
 }
 
 export default App;
+
+const popUp = <div className="container"><div className="modal" id="helpModal">
+    <div className="modal-dialog"><div className="modal-content">
+      <div className="modal-header"><h4 className="modal-title"><b>Getting Started</b></h4>
+      <button type="button" className="close" data-dismiss="modal">&times;</button></div>
+      <div className="modal-body">
+        <p>Select a time frame on the home page and click enter. From here you can select a keyword and see detailed analysis.</p>
+        <p><b>Limits</b></p>
+        <ul>
+          <li>Google Cloud API allows up to 600 requests every 1 min window. Should this rate limit be hit, Nimbus will wait 1 min before re-attempting.</li>
+          <li>CVSS scores are typically 5.0 until NVD/NIST completes their analysis, usually within 1-2 weeks of publishing.</li>
+        </ul>
+      </div>
+      <div className="modal-footer">
+          <button type="button" className="btn btn-danger" id="modalBtnClose" data-dismiss="modal">Close</button></div>
+      </div>
+    </div>
+  </div>
+</div>
