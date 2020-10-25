@@ -26,7 +26,7 @@ export function createCveList(data: nimbus_interface, keyword: string) {
     return <div>{Object.keys(data.processedData[keyword].cves).map((cve, index) => {
         const link = `https://nvd.nist.gov/vuln/detail/${cve}`
         return <div key={`${index}`}>
-            {cve} {buildSeverityBtn(data.processedData[keyword].cves[cve].severity)} {<a href={link}><i className="fas fa-link"></i></a>}
+            {cve} {buildSeverityBtn(data.processedData[keyword].cves[cve].severity)} {<a href={link} target="_blank"><i className="fas fa-link"></i></a>}
         </div>})}
     </div>
 

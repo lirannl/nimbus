@@ -98,7 +98,7 @@ function getCommonWords(data: Cve[]) {
                                 }
                             };
                         } catch(e) {
-                            console.log(e)
+                            console.log(e);
                         }
                     }
                     // console.debug(`${entity.name} - Type: ${entity.type}, Salience: ${entity.salience}`);
