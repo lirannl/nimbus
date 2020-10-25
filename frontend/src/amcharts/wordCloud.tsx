@@ -75,23 +75,31 @@ function getCommonWords(data: Cve[]) {
                     entityPerCVECount++;
                     // totalEntitiesCount++;
                     if (keywordMap[entity.name]) {
-                        keywordMap[entity.name]["severity"].push(cve_interface.cvss);
-                        keywordMap[entity.name]["cves"][cve_interface.id] = {
-                            "Published": cve_interface.Published,
-                            "severity": cve_interface.cvss
-                        }
-                        keywordMap[entity.name]["count"]++;
-                    } else {
-                        keywordMap[entity.name] = {
-                            "count": 1,
-                            "severity": [cve_interface.cvss],
-                            "cves": {
-                                [cve_interface.id] : {
-                                    "Published": cve_interface.Published,
-                                    "severity": cve_interface.cvss
-                                }
+                        try {
+                            keywordMap[entity.name]["severity"].push(cve_interface.cvss);
+                            keywordMap[entity.name]["cves"][cve_interface.id] = {
+                                "Published": cve_interface.Published,
+                                "severity": cve_interface.cvss
                             }
-                        };
+                            keywordMap[entity.name]["count"]++;
+                        } catch (e) {
+                            console.log(e);
+                        }
+                    } else {
+                        try {
+                            keywordMap[entity.name] = {
+                                "count": 1,
+                                "severity": [cve_interface.cvss],
+                                "cves": {
+                                    [cve_interface.id] : {
+                                        "Published": cve_interface.Published,
+                                        "severity": cve_interface.cvss
+                                    }
+                                }
+                            };
+                        } catch(e) {
+                            console.log(e)
+                        }
                     }
                     // console.debug(`${entity.name} - Type: ${entity.type}, Salience: ${entity.salience}`);
                 }
