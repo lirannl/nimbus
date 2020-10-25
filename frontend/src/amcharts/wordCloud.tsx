@@ -82,9 +82,7 @@ function getCommonWords(data: Cve[]) {
                                 "severity": cve_interface.cvss
                             }
                             keywordMap[entity.name]["count"]++;
-                        } catch (e) {
-                            console.log(e);
-                        }
+                        } catch (e) { }
                     } else {
                         try {
                             keywordMap[entity.name] = {
@@ -97,9 +95,7 @@ function getCommonWords(data: Cve[]) {
                                     }
                                 }
                             };
-                        } catch(e) {
-                            console.log(e);
-                        }
+                        } catch(e) { }
                     }
                     // console.debug(`${entity.name} - Type: ${entity.type}, Salience: ${entity.salience}`);
                 }
