@@ -6,12 +6,12 @@ Nimbus is a scaling cloud application that takes advantage of the considerable a
 
 ## Services used
 ### CIRCL CVE API
-The main source of raw data for Nimbus is the Computer Incident Response Center Luxembourg’s (CIRCL) public web interface to the open source tool cve-search. This tool collects data from NIST’s National Vulnerability Database and MITRE to provide various information - most importantly, CVE data. This API has no documentation on rate limiting and does not require authentication.
+The main source of raw data for Nimbus is the Computer Incident Response Center Luxembourg’s (CIRCL) public web interface to the open source tool cve-search. This tool collects data from NIST’s National Vulnerability Database and MITRE to provide various information - most importantly, CVE data. This API has no documentation on rate limiting and does not require authentication.<br>
 Endpoint: https://cve.circl.lu/api/ <br> 
 Docs: https://cve.circl.lu/api/
 
 ### Google Cloud’s Natural Language API
-Analysis of Nimbus’s raw CVE data is completed by Google Cloud’s entity analysis API. This API has associated costs for each service used and therefore requires credentials.
+Analysis of Nimbus’s raw CVE data is completed by Google Cloud’s entity analysis API. This API has associated costs for each service used and therefore requires credentials. <br>
 Endpoint: https://language.googleapis.com/v1/documents:analyzeSentiment <br>
 Docs: https://cloud.google.com/natural-language/docs
 
