@@ -23,3 +23,5 @@ To handle various rates of traffic, Nimbus’ scaling pool sits behind an intern
 
 ## Instructions
 Populate a prod.env file with the environment variables for `REDIS_URL`, and the API keys for Amazon and Google Cloud, then run `docker-compose up`
+
+[![HitCount](http://hits.dwyl.io/lirannl/nimbus.svg)](http://hits.dwyl.io/lirannl/nimbus)
