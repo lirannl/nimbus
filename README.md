@@ -1,7 +1,7 @@
 <img align="left" width="60" height="60" src="frontend/public/nimbus-logo.png" alt="Nimbus logo">
 
 # nimbus
-Nimbus is a scaling cloud application that takes advantage of the considerable amount of CVE data published each day to ultimately simplify the process of historically analysing the most severe vulnerabilities based on keyword association.
+Nimbus is a scalable cloud application that takes advantage of the considerable amount of CVE data published each day to ultimately simplify the process of historically analysing the most severe vulnerabilities based on keyword association.
 ![Home page sample](samples/home.png)
 ![Individual page sample](samples/cev.png)
 ![Other samples](samples/samples.png)
