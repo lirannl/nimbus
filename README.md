@@ -19,7 +19,7 @@ Docs: https://cloud.google.com/natural-language/docs
 
 ## Deployment
 To handle various rates of traffic, Nimbus’ scaling pool sits behind an internet facing load balancer with a metric based on CPU usage exceeding a 20% threshold.
-![Cloudwatch sample](cloudwatch-metrics.png)
+![Cloudwatch sample](samples/cloudwatch-metrics.png)
 
 ## Instructions
 Populate a prod.env file with the environment variables for `REDIS_URL`, and the API keys for Amazon and Google Cloud, then run `docker-compose up`
